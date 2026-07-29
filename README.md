@@ -55,7 +55,7 @@ To get to the CIE-XYZ color space from the sRGB color space, a transformation ma
 
 The transformation matrix, M, used in the code is derived from Bjorn Ottosson's other transformation matrices.
 
-In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-linear-srgb-to-oklab) that Bjorn Ottosson provided, he streamlined two conversion steps from linear RGB color space to CIE-XYZ color space and CIE-XYZ color space to LMS color space, by doing the product of the two tranformation matrices, M_M1. So,
+In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-linear-srgb-to-oklab) that Bjorn Ottosson provided, he streamlined two conversion steps from linear RGB color space to CIE-XYZ color space and CIE-XYZ color space to LMS color space, by doing the product of the two tranformation matrices, M1_M. So,
 
 |     |     |     |     |     |
 | --- | --- | --- | --- | --- |
@@ -63,7 +63,7 @@ In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-li
 | Y   | =   | M   | \*  | G'  |
 | Z   |     |     |     | B'  |
 
-**and**
+---
 
 |     |     |     |     |     |
 | --- | --- | --- | --- | --- |
@@ -76,7 +76,7 @@ In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-li
 |     |     |     |     |     |     |     |
 | --- | --- | --- | --- | --- | --- | --- |
 | l   |     |     |     |     |     | R'  |
-| m   | =   | M   | \*  | M1  | \*  | G'  |
+| m   | =   | M1  | \*  | M   | \*  | G'  |
 | s   |     |     |     |     |     | B'  |
 
 **or**
@@ -84,24 +84,28 @@ In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-li
 |     |     |      |     |     |     |
 | --- | --- | ---- | --- | --- | --- |
 | l   |     |      |     |     | R'  |
-| m   | =   | M_M1 | \*  |     | G'  |
+| m   | =   | M1_M | \*  |     | G'  |
 | s   |     |      |     |     | B'  |
 
 The issue is that Bjorn Ottosson never provided never provided the transformation matrix, M, that he used in his calculations or formula, but have stated his matrix have been dervied using a higher precision sRGB (transformation) matrix and exact matching D65.
 
-Attempts to create values in Bjorn Ottosson's M_M1 transformation matrices, could not be replicated with other existing transformation matrix, M, found from other sources like **Alexi Boronine's hsluv-haxe**, **Imaging-Engineering** and **Wikipedia**, due to the differences in precision of the values in the matrix.
+Attempts to create values in Bjorn Ottosson's M_M1 transformation matrices, could not be replicated with other existing transformation matrix, M, found from other sources like **Alexi Boronine's hsluv-haxe**, **Imaging-Engineering** and **Wikipedia**, due to the differences in precision of the values in the matrix. Effectively, no two source for the sRGB to CIE-XYZ transformation matrix, M, with a standard illuminant of D65 will be the same. It appears to be very subjective based on who estimated it.
 
-To best accurately obtain M that Bjorn Ottosson would have used, it was simply derived using the known matrices, M_M1 and M1 by multiplying the M_M1 matrix with the inverse of the M1 matrix. Both M_M1 and M1 matrices comes from Bjorn Ottosson and wikipedia. The formula comes from a Math Stack Exchange discussion.
+To best accurately obtain the transformation matrix M that Bjorn Ottosson would have used, it was simply derived using the known matrices, M1_M and M1 by multiplying the inverse of the M1 matrix with M1_M. Both M1_M and M1 matrices comes from Bjorn Ottosson and wikipedia. The [formula to find the unknown matrix of a given matrix multiplication equation](https://math.stackexchange.com/questions/350463/find-matrix-a-if-ab-c-and-b-and-c-are-known) comes from a Math Stack Exchange discussion. Note the order of matrices matter in matrix multiplication.
+
+Given A, B, C are matrices with the same dimension...
 
 `A * B = C`
 
-`A = C * B^-1` _(Allowed, since matrices A, B, and C have the same dimension)_
+`A = C * B^-1` _(Note: The order of matrix multiplication when finding A)_
+
+`B = A^-1 * C` _(Note: The order of matrix multiplication when finding B)_
 
 or...
 
-`M * M1 = M_M1`
+`M1 * M = M1_M`
 
-`M = M_M1 * M1^-1`
+`M = M1^-1 * M_M1`
 
 The inverse matrix of M1 and M2 and the various matrices multiplication were calculated using [high precision matrix calculators developed and provided reshish](https://matrix.reshish.com/).
 
