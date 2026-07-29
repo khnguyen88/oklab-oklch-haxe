@@ -129,4 +129,54 @@ class Oklab{
 	private static var m_inv_b0:Float = 0.04143602416910443;
 	private static var m_inv_b1:Float = -0.20377796567354506;
 	private static var m_inv_b2:Float = 1.0574896845007096;
+
+	//Parser Functions
+	private static function parseHexByChannel(hex: String, channel: String = ''){
+		var hexWithoutPound = hex;
+		var hashIndex = hex.indexOf('#');
+		if(hashIndex != -1){
+			hexWithoutPound = hex.substring(hashIndex + 1);
+		}
+		if(hexWithoutPound.length != 6){
+			return '';
+		}
+
+		switch(channel){
+			case 'r', 'R', 'red', 'Red':
+				return hexWithoutPound.substring(0, 2);
+			case 'g', 'G', 'green', 'Green':
+				return hexWithoutPound.substring(2, 4);
+			case 'b', 'B', 'blue', 'Blue':			
+				return hexWithoutPound.substring(4, 6);
+			case _:
+				return '';
+		}
+	}
+
+	//Conversion Functions
+	private static inline final HEX_CHAR = '0123456789ABCDEF';
+
+	private static function rgbChannelToHex(channelVal: Int){
+		var firstHexCharInd = Std.int(Math.floor(channelVal / 16));
+		var secondHexCharInd = channelVal % 16;
+		var hexVal = HEX_CHAR.charAt(firstHexCharInd) + HEX_CHAR.charAt(secondHexCharInd);
+		return hexVal;
+	}
+
+	private static function hexToRGBChannel(hexVal: String){
+		var firstHexChar = hexVal.charAt(0);
+		var firstHexCharInd = HEX_CHAR.indexOf(firstHexChar); 
+		var secondHexChar = hexVal.charAt(1);
+		var secondHexCharInd = HEX_CHAR.indexOf(secondHexChar);
+		var rgbChannelVal = firstHexCharInd * 16 + secondHexCharInd;
+		return rgbChannelVal;
+	}
+
+	private static function rgbChannelToLinear(channelVal: Int){
+		return channelVal / 255.0;
+	}
+
+	private static function linearToRGBChannel(channelVal: Float){
+		return Math.round(channelVal * 255.0);
+	}
 }

@@ -159,6 +159,8 @@ The science and math used to understand the Oklab and Oklch color space and impl
 
 - [Math Stack Exchange - Find Missing Matrix A, Given A \* B = C](https://math.stackexchange.com/questions/350463/find-matrix-a-if-ab-c-and-b-and-c-are-known)
 
+- [Omni Calculator - How to Convert Number to Hexadecimal](https://www.omnicalculator.com/conversion/decimal-to-hexadecimal)
+
 ### Reference Project
 
 In addition to Haxe's own documentation, I used Alexei's hsluv-haxe as a resource to learn and understand how to setup project structure and write the language syntax for Haxe. Since it's the go-to module for the Haxe community, I know it'll be a reliable resource. There will be similarity when you compare the two projects, but luckily the math for the hsluv and oklab/oklch will be _mostly_ different! The process required to convert sRGB to sRGB' and sRGB' to CIEXYZ is the same for both color spaces.
