@@ -111,6 +111,22 @@ The inverse matrix of M1 and M2 and the various matrices multiplication were cal
 
 Values from the computed matrices were verified using Wolfram Alpha's calculator. Wolfram Alpha's estimate was not used because the results provided rounded and lower precision estimates.
 
+### Normalized sRGB and Linear sRGB, Apply Gamma vs Linearlize
+
+The most common representation of color is sRGB, or standard RGB. It is an additive color model. Starting from black, as you increase the value of each color channel it gets closer to white.
+
+sRGB colors are represented as non-linear 8-bit color depth, with value ranging from 0-255. sRGB colors naturally comes with the gamma function applied making it nonlinear. Each channel can range from a 0-255 color value. Non-linear in terms of sRGB is the approximate human brightness preciption of colors. It does not actually represent the actual physical light intensity just how we precieved it which is skewed.
+
+Gamma is curve function applied to linear light, and intended to represent how human precieves the brightness of colors and thus different color channels. Human preciption of brightness tend to curve color towards dark tones or values since we're more sensitive to differences there. Gamma values tend to range from 0 to 1, hence why we need to remove the color bit depth by normalizing it or dividing each color channel over 255. Gamma curve function is the observed byproduct of CRT screen physically worked and how the human eyes precieves and response to it. Brightness is a power law of voltage, hence non-linear.
+
+Linear light basically the physical intensity of light, relative to photon count or amount of light avaliable (of each color channel). Aka photon count / amount of light available, per color channel. This conversion is needed before applying matrix computation with a transformation matrix to change it to a different color space. Aka sRGB -> CIE-XYZ.
+
+CIE-XYZ color space is important because it designed to match human vision and descibes how humans see color, by observing and recording how they matched colors. Where Y represent brightness, and X and Z represents the red/green/blue responses. It is use as the base and intermediate color space before we shift to a different color space. It requires the sRGB color channels to be linearized.
+
+"Removing gamma from the sRGB data" or "linearizing the sRGB data" means the same thing. We remove the gamma curve function from the color channel and transform it what it physical represent.
+
+"Applying gamma" means to simply using utilizing gamma curve function to adjust the color channel values into how is precieved by people.
+
 ## Resources / References
 
 ### Color Science
@@ -132,6 +148,9 @@ The science and math used to understand the Oklab and Oklch color space and impl
 - [Bruce Lindbloom = RGB/XYZ Matrices](http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html)
 
 - [Wikipedia - From sRGB to CIE-XYZ](https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ)
+
+- [Cambridge in Colour](https://www.cambridgeincolour.com/tutorials/gamma-correction.htm)
+- [Charles Poynton - Frequently Asked Questions about Gamma](https://www.poynton.ca/faq/gammafaq/GammaFAQ.pdf)
 
 ### Programming Language
 

@@ -5,24 +5,34 @@ class Oklab{
     public var hex:String;
 
     // RGB
-	public var rgb_r:Float;
-	public var rgb_g:Float;
-	public var rgb_b:Float;
+	public var rgb_r:Int;
+	public var rgb_g:Int;
+	public var rgb_b:Int;
 
-    // LINEAR RGB
-	public var rgb_r_:Float;
-	public var rgb_g_:Float;
-	public var rgb_b_:Float;
+    // NORMALIZED RGB (W/ GAMMA)
+	public var rgb_r_norm:Float;
+	public var rgb_g_norm:Float;
+	public var rgb_b_norm:Float;
 
-	// CIE XYZ
+    // LINEAR RGB (W/O GAMMA)
+	public var rgb_r_lin:Float;
+	public var rgb_g_lin:Float;
+	public var rgb_b_lin:Float;
+
+	// CIE XYZ (LINEAR)
 	public var xyz_x:Float;
 	public var xyz_y:Float;
 	public var xyz_z:Float;
 
-	// LMS
+	// LMS (LINEAR)
 	public var lms_l:Float;
 	public var lms_m:Float;
 	public var lms_s:Float;
+
+	// LMS' (NON_LINEAR)
+	public var lms_l_nl:Float;
+	public var lms_m_nl:Float;
+	public var lms_s_nl:Float;
 
     // OKLAB
 	private var oklab_l:Float;
@@ -33,8 +43,8 @@ class Oklab{
     // OKLCH
 	private var oklch_l:Float;
 	public var oklch_lr: Float;
-	public var oklch_a:Float;
-	public var oklch_b:Float;
+	public var oklch_c:Float;
+	public var oklch_h:Float;
 
     // Transformation Matrices
 	// Transformation matrix, M1_M. For conversion from RGB' (Linear RGB) to OKLAB. Source Ottoson.
@@ -172,11 +182,168 @@ class Oklab{
 		return rgbChannelVal;
 	}
 
-	private static function rgbChannelToLinear(channelVal: Int){
+	private static function rgbChannelToNormialized(channelVal: Int){
 		return channelVal / 255.0;
 	}
 
-	private static function linearToRGBChannel(channelVal: Float){
+	private static function normalizedToRgbChannel(channelVal: Float){
 		return Math.round(channelVal * 255.0);
 	}
+
+	private static function normalizedRgbChannelToLinear(normVal: Float){
+		var linVal: Float;
+
+		if(normVal <= 0.0405){
+			linVal = normVal / 12.92;
+		}
+		else{
+			linVal = Math.pow(((normVal + 0.055)/1.055), 2.4);
+		}
+
+		return linVal;
+	}
+
+	private static function linearRgbChannelToNormalized(linVal: Float){
+		var normVal: Float;
+
+		if(linVal <= 0.0031308){
+			normVal = linVal * 12.92;
+		}
+		else{
+			normVal = 1.055 * Math.pow(linVal, (1/2.4)) - 0.055;
+		}
+	
+		return normVal;
+	}
+
+	private static function linearLmsConeToNonLinear(cone: Float){
+		return Math.pow(cone, (1/3));
+	}
+
+	private static function nonLinearLmsConeToLinear(nonLinCone: Float){
+		return nonLinCone * nonLinCone * nonLinCone;
+	}
+
+	private static function noWhiteRefOkLightToWhiteRefOkLight(l: Float){
+		var k1: Float = 0.206;
+		var k2: Float = 0.03;
+		var k3: Float = (1 + k1) / (1 + k2);
+		var eqSegment1: Float = k3 * l - k1;
+		var eqSegment2a: Float = Math.pow((k3 * l) - k1, 2);
+		var eqSegment2b: Float = 4 * k2 * k3 * l;
+		var eqSegment2: Float = Math.sqrt (eqSegment2a + eqSegment2b);
+		var lr = (eqSegment1 + eqSegment2) / 2;
+		return lr;
+	}
+
+	private static function whiteRefOkLightToNoWhiteRefOkLight(lr: Float){
+		var k1: Float = 0.206;
+		var k2: Float = 0.03;
+		var k3: Float = (1 + k1) / (1 + k2);
+		var eqSegment1: Float = lr * (lr + k1);
+		var eqSegment2: Float = k3 * (lr + k2);
+		var l = eqSegment1 / eqSegment2;
+		return l;
+	}
+
+	public function hexToRgb(){
+		this.rgb_r = hexToRGBChannel(parseHexByChannel(this.hex, 'r'));
+		this.rgb_g = hexToRGBChannel(parseHexByChannel(this.hex, 'g'));
+		this.rgb_b = hexToRGBChannel(parseHexByChannel(this.hex, 'b'));
+	}
+	public function rgbToHex(){
+		this.hex = "#";
+		this.hex += rgbChannelToHex(this.rgb_r);
+		this.hex += rgbChannelToHex(this.rgb_g);
+		this.hex += rgbChannelToHex(this.rgb_b);
+	}
+
+	public function rgbToNormalized(){
+		this.rgb_r_norm = rgbChannelToNormialized(this.rgb_r);
+		this.rgb_g_norm = rgbChannelToNormialized(this.rgb_g);
+		this.rgb_b_norm = rgbChannelToNormialized(this.rgb_b);
+	}
+	
+	public function normalizedToRgb(){
+		this.rgb_r = normalizedToRgbChannel(this.rgb_r_norm);
+		this.rgb_g = normalizedToRgbChannel(this.rgb_g_norm);
+		this.rgb_b = normalizedToRgbChannel(this.rgb_b_norm);
+	}
+
+	public function normalizedRgbToLinear(){
+		this.rgb_r_lin = normalizedRgbChannelToLinear(this.rgb_r_norm);
+		this.rgb_g_lin = normalizedRgbChannelToLinear(this.rgb_g_norm);
+		this.rgb_b_lin = normalizedRgbChannelToLinear(this.rgb_b_norm);
+	}
+
+	public function linearRgbToNormGamma(){		
+		this.rgb_r_norm = linearRgbChannelToNormalized(this.rgb_r_lin);
+		this.rgb_g_norm = linearRgbChannelToNormalized(this.rgb_g_lin);
+		this.rgb_b_norm = linearRgbChannelToNormalized(this.rgb_b_lin);
+	}
+
+	public function linearRgbToXyz(){
+		this.xyz_x = m_r0 * this.rgb_r_lin + m_r1 * this.rgb_g_lin + m_r2 * this.rgb_b_lin;
+		this.xyz_y = m_g0 * this.rgb_r_lin + m_g1 * this.rgb_g_lin + m_g2 * this.rgb_b_lin;
+		this.xyz_z = m_b0 * this.rgb_r_lin + m_b1 * this.rgb_g_lin + m_b2 * this.rgb_b_lin;
+	}
+
+	public function xyzToLinearRgb(){
+		this.rgb_r_lin = m_inv_r0 * this.xyz_x + m_inv_r1 * this.xyz_y + m_inv_r2 * this.xyz_z;
+		this.rgb_g_lin = m_inv_g0 * this.xyz_x + m_inv_g1 * this.xyz_y + m_inv_g2 * this.xyz_z;
+		this.rgb_b_lin = m_inv_b0 * this.xyz_x + m_inv_b1 * this.xyz_y + m_inv_b2 * this.xyz_z;
+	}
+
+	public function xyzToLms(){
+		this.lms_l = m1_x0 * this.xyz_x + m1_x1 * this.xyz_y + m1_x2 * this.xyz_z;
+		this.lms_m = m1_y0 * this.xyz_x + m1_y1 * this.xyz_y + m1_y2 * this.xyz_z;
+		this.lms_s = m1_z0 * this.xyz_x + m1_z1 * this.xyz_y + m1_z2 * this.xyz_z;
+	}
+
+	public function lLmsToXyz(){
+		this.rgb_r_lin = m1_x0 * this.xyz_x + m1_x1 * this.xyz_y + m1_x2 * this.xyz_z;
+		this.rgb_g_lin = m1_y0 * this.xyz_x + m1_y1 * this.xyz_y + m1_y2 * this.xyz_z;
+		this.rgb_b_lin = m1_z0 * this.xyz_x + m1_z1 * this.xyz_y + m1_z2 * this.xyz_z;
+	}
+
+	public function lmsToNonLinearLms(){
+		this.lms_l_nl = linearLmsConeToNonLinear(this.lms_l);
+		this.lms_m_nl = linearLmsConeToNonLinear(this.lms_m);
+		this.lms_s_nl = linearLmsConeToNonLinear(this.lms_s);
+	}
+
+	public function nonLinearLmsToLms(){
+		this.lms_l = nonLinearLmsConeToLinear(this.lms_l_nl);
+		this.lms_m = nonLinearLmsConeToLinear(this.lms_m_nl);
+		this.lms_s = nonLinearLmsConeToLinear(this.lms_s_nl);
+	}
+
+	public function nonLinearLmsToOklab(){
+		this.oklab_l = m2_l0 * this.lms_l_nl + m2_l1 * this.lms_m_nl + m2_l2 * this.lms_s_nl;
+		this.oklab_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
+		this.oklab_a = m2_m0 * this.lms_l_nl + m2_m1 * this.lms_m_nl + m2_m2 * this.lms_s_nl;
+		this.oklab_b = m2_s0 * this.lms_l_nl + m2_s1 * this.lms_m_nl + m2_s2 * this.lms_s_nl;
+	}
+
+	public function oklabToNonLinearLms(){
+		this.lms_l_nl = m2_inv_l0 * this.oklab_l + m2_inv_l1 * this.oklab_a + m2_inv_l2 * this.oklab_b;
+		this.lms_m_nl = m2_inv_m0 * this.oklab_l + m2_inv_m1 * this.oklab_a + m2_inv_m2 * this.oklab_b;
+		this.lms_s_nl = m2_inv_s0 * this.oklab_l + m2_inv_s1 * this.oklab_a + m2_inv_s2 * this.oklab_b;
+	}
+
+	public function OklabToOklch(){
+		this.oklch_l = this.oklab_l;
+		this.oklch_lr - this.oklab_lr;
+		this.oklch_c = Math.sqrt(Math.pow(this.oklab_a, 2) + Math.pow(this.oklab_b, 2));
+		this.oklch_h = Math.atan2(this.oklab_b, this.oklab_a);
+	}
+
+	public function OklchToOklab(){
+		this.oklab_l = this.oklch_l;
+		this.oklab_lr = this.oklch_lr;
+		this.oklab_a = this.oklch_c * Math.cos(this.oklch_h);
+		this.oklab_b = this.oklch_c * Math.sin(this.oklch_h);
+	}
+
+
 }
