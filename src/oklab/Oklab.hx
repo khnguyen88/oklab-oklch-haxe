@@ -35,16 +35,21 @@ class Oklab{
 	public var lms_s_nl:Float;
 
     // OKLAB
-	private var oklab_l:Float;
+	public var oklab_l:Float;
 	public var oklab_lr: Float;
 	public var oklab_a:Float;
 	public var oklab_b:Float;
 
     // OKLCH
-	private var oklch_l:Float;
+	public var oklch_l:Float;
 	public var oklch_lr: Float;
 	public var oklch_c:Float;
 	public var oklch_h:Float;
+
+	public function new() {
+		this.hex="#FFFFFF";
+		this.hexToOklab();
+	}
 
     // Transformation Matrices
 	// Transformation matrix, M1_M. For conversion from RGB' (Linear RGB) to OKLAB. Source Ottoson.
@@ -166,6 +171,35 @@ class Oklab{
 	//Conversion Functions
 	private static inline final HEX_CHAR = '0123456789ABCDEF';
 
+	function isStartingCharPound(s:String): Bool{
+		if(s.length > 0 && s.charAt(0) == "#"){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	function isValidHexAfterHash(hex:String):Bool {
+		for (i in 1 ... hex.length) {
+			var c = hex.charAt(i);
+			if (HEX_CHAR.indexOf(c) == -1) return false;
+		}
+		return true;
+	}
+
+	public function sanitizeHex(hex: String): String{
+		var santizedHex: String = "";
+		if(!this.isStartingCharPound(hex)){
+			santizedHex = "#" + hex;
+		}
+
+		if(!this.isValidHexAfterHash(hex)){
+			santizedHex = '#000000';
+		}
+		return santizedHex;
+	}
+
 	private static function rgbChannelToHex(channelVal: Int){
 		var firstHexCharInd = Std.int(Math.floor(channelVal / 16));
 		var secondHexCharInd = channelVal % 16;
@@ -246,104 +280,194 @@ class Oklab{
 		return l;
 	}
 
-	public function hexToRgb(){
+	private function hexToRgb(){
 		this.rgb_r = hexToRGBChannel(parseHexByChannel(this.hex, 'r'));
 		this.rgb_g = hexToRGBChannel(parseHexByChannel(this.hex, 'g'));
 		this.rgb_b = hexToRGBChannel(parseHexByChannel(this.hex, 'b'));
 	}
-	public function rgbToHex(){
+	private function rgbToHex(){
 		this.hex = "#";
 		this.hex += rgbChannelToHex(this.rgb_r);
 		this.hex += rgbChannelToHex(this.rgb_g);
 		this.hex += rgbChannelToHex(this.rgb_b);
 	}
 
-	public function rgbToNormalized(){
+	private function rgbToNormalized(){
 		this.rgb_r_norm = rgbChannelToNormialized(this.rgb_r);
 		this.rgb_g_norm = rgbChannelToNormialized(this.rgb_g);
 		this.rgb_b_norm = rgbChannelToNormialized(this.rgb_b);
 	}
 	
-	public function normalizedToRgb(){
+	private function normalizedToRgb(){
 		this.rgb_r = normalizedToRgbChannel(this.rgb_r_norm);
 		this.rgb_g = normalizedToRgbChannel(this.rgb_g_norm);
 		this.rgb_b = normalizedToRgbChannel(this.rgb_b_norm);
 	}
 
-	public function normalizedRgbToLinear(){
+	private function normalizedRgbToLinear(){
 		this.rgb_r_lin = normalizedRgbChannelToLinear(this.rgb_r_norm);
 		this.rgb_g_lin = normalizedRgbChannelToLinear(this.rgb_g_norm);
 		this.rgb_b_lin = normalizedRgbChannelToLinear(this.rgb_b_norm);
 	}
 
-	public function linearRgbToNormGamma(){		
+	public function linearRgbToNormalized(){		
 		this.rgb_r_norm = linearRgbChannelToNormalized(this.rgb_r_lin);
 		this.rgb_g_norm = linearRgbChannelToNormalized(this.rgb_g_lin);
 		this.rgb_b_norm = linearRgbChannelToNormalized(this.rgb_b_lin);
 	}
 
-	public function linearRgbToXyz(){
+	private function linearRgbToXyz(){
 		this.xyz_x = m_r0 * this.rgb_r_lin + m_r1 * this.rgb_g_lin + m_r2 * this.rgb_b_lin;
 		this.xyz_y = m_g0 * this.rgb_r_lin + m_g1 * this.rgb_g_lin + m_g2 * this.rgb_b_lin;
 		this.xyz_z = m_b0 * this.rgb_r_lin + m_b1 * this.rgb_g_lin + m_b2 * this.rgb_b_lin;
 	}
 
-	public function xyzToLinearRgb(){
+	private function xyzToLinearRgb(){
 		this.rgb_r_lin = m_inv_r0 * this.xyz_x + m_inv_r1 * this.xyz_y + m_inv_r2 * this.xyz_z;
 		this.rgb_g_lin = m_inv_g0 * this.xyz_x + m_inv_g1 * this.xyz_y + m_inv_g2 * this.xyz_z;
 		this.rgb_b_lin = m_inv_b0 * this.xyz_x + m_inv_b1 * this.xyz_y + m_inv_b2 * this.xyz_z;
 	}
 
-	public function xyzToLms(){
+	private function xyzToLms(){
 		this.lms_l = m1_x0 * this.xyz_x + m1_x1 * this.xyz_y + m1_x2 * this.xyz_z;
 		this.lms_m = m1_y0 * this.xyz_x + m1_y1 * this.xyz_y + m1_y2 * this.xyz_z;
 		this.lms_s = m1_z0 * this.xyz_x + m1_z1 * this.xyz_y + m1_z2 * this.xyz_z;
 	}
 
-	public function lLmsToXyz(){
+	private function lmsToXyz(){
 		this.rgb_r_lin = m1_x0 * this.xyz_x + m1_x1 * this.xyz_y + m1_x2 * this.xyz_z;
 		this.rgb_g_lin = m1_y0 * this.xyz_x + m1_y1 * this.xyz_y + m1_y2 * this.xyz_z;
 		this.rgb_b_lin = m1_z0 * this.xyz_x + m1_z1 * this.xyz_y + m1_z2 * this.xyz_z;
 	}
 
-	public function lmsToNonLinearLms(){
+	private function lmsToNonLinearLms(){
 		this.lms_l_nl = linearLmsConeToNonLinear(this.lms_l);
 		this.lms_m_nl = linearLmsConeToNonLinear(this.lms_m);
 		this.lms_s_nl = linearLmsConeToNonLinear(this.lms_s);
 	}
 
-	public function nonLinearLmsToLms(){
+	private function nonLinearLmsToLms(){
 		this.lms_l = nonLinearLmsConeToLinear(this.lms_l_nl);
 		this.lms_m = nonLinearLmsConeToLinear(this.lms_m_nl);
 		this.lms_s = nonLinearLmsConeToLinear(this.lms_s_nl);
 	}
 
-	public function nonLinearLmsToOklab(){
+	private function nonLinearLmsToOklab(){
 		this.oklab_l = m2_l0 * this.lms_l_nl + m2_l1 * this.lms_m_nl + m2_l2 * this.lms_s_nl;
 		this.oklab_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
 		this.oklab_a = m2_m0 * this.lms_l_nl + m2_m1 * this.lms_m_nl + m2_m2 * this.lms_s_nl;
 		this.oklab_b = m2_s0 * this.lms_l_nl + m2_s1 * this.lms_m_nl + m2_s2 * this.lms_s_nl;
 	}
 
-	public function oklabToNonLinearLms(){
+	private function oklabToNonLinearLms(){
 		this.lms_l_nl = m2_inv_l0 * this.oklab_l + m2_inv_l1 * this.oklab_a + m2_inv_l2 * this.oklab_b;
 		this.lms_m_nl = m2_inv_m0 * this.oklab_l + m2_inv_m1 * this.oklab_a + m2_inv_m2 * this.oklab_b;
 		this.lms_s_nl = m2_inv_s0 * this.oklab_l + m2_inv_s1 * this.oklab_a + m2_inv_s2 * this.oklab_b;
 	}
 
-	public function OklabToOklch(){
+	private function oklabToOklch(){
 		this.oklch_l = this.oklab_l;
-		this.oklch_lr - this.oklab_lr;
+		this.oklch_lr = this.oklab_lr;
 		this.oklch_c = Math.sqrt(Math.pow(this.oklab_a, 2) + Math.pow(this.oklab_b, 2));
 		this.oklch_h = Math.atan2(this.oklab_b, this.oklab_a);
 	}
 
-	public function OklchToOklab(){
+	private function oklchToOklab(){
 		this.oklab_l = this.oklch_l;
 		this.oklab_lr = this.oklch_lr;
 		this.oklab_a = this.oklch_c * Math.cos(this.oklch_h);
 		this.oklab_b = this.oklch_c * Math.sin(this.oklch_h);
 	}
+
+
+	public function hexToOklab(){
+		this.hexToOklch();
+	}
+
+	public function hexToOklch(){
+		this.hexToRgb();
+		this.rgbToOklch();
+	}
+
+	public function rgbToOklab(){
+		this.rgbToOklch();
+	}
+
+	public function rgbToOklch(){
+		this.rgbToHex();
+		this.rgbToNormalized();
+		this.normalizedRgbToLinear();
+		this.linearRgbToXyz();
+		this.xyzToLms();
+		this.lmsToNonLinearLms();
+		this.nonLinearLmsToOklab();
+		this.oklabToOklch();
+	}
+
+	public function oklchToRgb(){
+		this.oklchToOklab();
+
+	}
+
+	public function oklchToHex(){
+		this.oklchToOklab();
+		this.oklabToNonLinearLms();
+		this.nonLinearLmsToLms();
+		this.lmsToXyz();
+		this.xyzToLinearRgb();
+		this.linearRgbToNormalized();
+		this.normalizedToRgb();
+		this.rgbToHex();
+	}
+
+	public function setRgb(r: Int = 0, g: Int = 0, b: Int = 0){
+		this.rgb_r = r;
+		this.rgb_r = g;
+		this.rgb_r = b;
+		this.rgbToOklab();
+	};
+
+
+	public function setHex(hex: String = "#000000"){
+		this.hex = this.sanitizeHex(hex);
+		this.hexToOklab();
+	};
+
+	public function setOklch(l: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
+		this.oklch_l = l;
+		this.oklch_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
+		this.oklch_c = c;
+		this.oklch_h = h;
+		this.oklchToHex();
+	};
+
+	public function setOklab(l: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
+		this.oklab_l = l;
+		this.oklab_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
+		this.oklab_a = a;
+		this.oklab_b = b;
+		this.oklchToOklab();
+	}
+
+	public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
+		this.oklch_lr = lr;
+		this.oklch_l = whiteRefOkLightToNoWhiteRefOkLight(this.oklch_lr);
+		this.oklch_c = c;
+		this.oklch_h = h;
+		this.oklchToHex();
+	};
+
+	public function setOkLrab(lr: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
+		this.oklab_lr = lr;
+		this.oklab_l = whiteRefOkLightToNoWhiteRefOkLight(this.oklab_lr);
+		this.oklab_a = a;
+		this.oklab_b = b;
+		this.oklchToOklab();
+	}
+
+
+	
+
 
 
 }
