@@ -284,20 +284,22 @@ class Oklab{
 		return (r_lin >= 0 && r_lin <= 1 && g_lin >= 0 && g_lin <=1 && b_lin >= 0 && b_lin <= 1);
 	}
 
-	private function boundChromaToRgbGamutRecursive(l: Float, h: Float, c_low: Float = 0.0, c_high: Float = 0.0, recDepth: Int = 20 ): Float{
-		if (recDepth <= 0){
+	private function boundChromaToRgbGamutRecursive(l: Float, h: Float, c_low: Float = 0.0, c_high: Float = 0.0, recDepth: Int = 20): Float{
+		if (recDepth <= 0 || (c_high - c_low) < 1e-4){
 			return c_low;
-		} 
-		
+		}
+
 		var c_mid = (c_low + c_high) * 0.5;
+		this.oklch_l = l;
+		this.oklch_h = h;
 		this.oklch_c = c_mid;
 		this.oklchToLinearRGB();
 
 		if(this.inGamut(rgb_r_lin, rgb_g_lin, rgb_b_lin)){
-			return this.boundChromaToRgbGamutRecursive(l, h, c_mid, c_high);
+			return this.boundChromaToRgbGamutRecursive(l, h, c_mid, c_high, recDepth - 1);
 		}
 		else{
-			return this.boundChromaToRgbGamutRecursive(1, h, c_low, c_mid);
+			return this.boundChromaToRgbGamutRecursive(l, h, c_low, c_mid, recDepth - 1);
 		}
 	}
 
