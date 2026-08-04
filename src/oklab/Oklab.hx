@@ -501,7 +501,7 @@ class Oklab{
 		this.oklab_b = b;
 		this.oklabToOklch();
 		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
-		this.oklchToOklab();
+		this.oklchToHex();
 		trace('[setOklab] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
@@ -523,7 +523,7 @@ class Oklab{
 		this.oklab_b = b;
 		this.oklabToOklch();
 		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
-		this.oklchToOklab();
+		this.oklchToHex();
 		trace('[setOkLrab] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
 		trace('[setOkLrab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
