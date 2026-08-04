@@ -189,7 +189,7 @@ class Oklab{
 	}
 
 	public function sanitizeHex(hex: String): String{
-		var sanitizedHex: String = "";
+		var sanitizedHex: String = hex;
 		if(!this.isStartingCharPound(hex)){
 			sanitizedHex = "#" + hex;
 		}
