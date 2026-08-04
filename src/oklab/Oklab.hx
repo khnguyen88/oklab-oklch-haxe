@@ -454,7 +454,7 @@ class Oklab{
 
 
 	public function oklchToLinearRGB(){
-		this.oklabToOklch();
+		this.oklchToOklab();
 		this.oklabToNonLinearLms();
 		this.nonLinearLmsToLms();
 		this.lmsToXyz();
@@ -468,24 +468,30 @@ class Oklab{
 
 	public function setRgb(r: Int = 0, g: Int = 0, b: Int = 0){
 		this.rgb_r = r;
-		this.rgb_r = g;
-		this.rgb_r = b;
+		this.rgb_g = g;
+		this.rgb_b = b;
 		this.rgbToOklab();
+		trace('[setRgb] rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b}) hex=${this.hex}');
+		trace('[setRgb] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
 	};
 
 
 	public function setHex(hex: String = "#000000"){
 		this.hex = this.sanitizeHex(hex);
 		this.hexToOklab();
+		trace('[setHex] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
+		trace('[setHex] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
 	};
 
 	public function setOklch(l: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
 		this.oklch_l = l;
-		this.oklch_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
+		this.oklch_lr = noWhiteRefOkLightToWhiteRefOkLight(l);
 		this.oklch_c = c;
 		this.oklch_h = h;
 		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, c, 20);
 		this.oklchToHex();
+		trace('[setOklch] oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h}) oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b})');
+		trace('[setOklch] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	};
 
 	public function setOklab(l: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
@@ -496,6 +502,8 @@ class Oklab{
 		this.oklabToOklch();
 		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 		this.oklchToOklab();
+		trace('[setOklab] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
+		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
 
 	public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
@@ -504,6 +512,8 @@ class Oklab{
 		this.oklch_h = h;
 		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, c, 20);
 		this.oklchToHex();
+		trace('[setOkLrch] oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h}) oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b})');
+		trace('[setOkLrch] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	};
 
 	public function setOkLrab(lr: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
@@ -514,6 +524,8 @@ class Oklab{
 		this.oklabToOklch();
 		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 		this.oklchToOklab();
+		trace('[setOkLrab] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
+		trace('[setOkLrab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
 
 }
