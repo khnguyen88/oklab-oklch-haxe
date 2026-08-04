@@ -482,6 +482,7 @@ class Oklab{
 		this.oklch_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
 		this.oklch_c = c;
 		this.oklch_h = h;
+		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, c, 20);
 		this.oklchToHex();
 	};
 
@@ -490,6 +491,8 @@ class Oklab{
 		this.oklab_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
 		this.oklab_a = a;
 		this.oklab_b = b;
+		this.oklabToOklch();
+		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 		this.oklchToOklab();
 	}
 
