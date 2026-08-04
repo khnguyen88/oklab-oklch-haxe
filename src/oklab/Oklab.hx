@@ -171,7 +171,7 @@ class Oklab{
 	//Conversion Functions
 	private static inline final HEX_CHAR = '0123456789ABCDEF';
 
-	function isStartingCharPound(s:String): Bool{
+	public function isStartingCharPound(s:String): Bool{
 		if(s.length > 0 && s.charAt(0) == "#"){
 			return true;
 		}
@@ -180,7 +180,7 @@ class Oklab{
 		}
 	}
 
-	function isValidHexAfterHash(hex:String):Bool {
+	public function isValidHexAfterHash(hex:String):Bool {
 		for (i in 1 ... hex.length) {
 			var c = hex.charAt(i);
 			if (HEX_CHAR.indexOf(c) == -1) return false;
@@ -278,6 +278,27 @@ class Oklab{
 		var eqSegment2: Float = k3 * (lr + k2);
 		var l = eqSegment1 / eqSegment2;
 		return l;
+	}
+
+	private function inGamut(r_lin: Float, g_lin: Float, b_lin: Float){
+		return (r_lin >= 0 && r_lin <= 1 && g_lin >= 0 && g_lin <=1 && b_lin >= 0 && b_lin <= 1);
+	}
+
+	private function boundChromaToRgbGamutRecursive(l: Float, h: Float, c_low: Float = 0.0, c_high: Float = 0.0, recDepth: Int = 20 ): Float{
+		if (recDepth <= 0){
+			return c_low;
+		} 
+		
+		var c_mid = (c_low + c_high) * 0.5;
+		this.oklch_c = c_mid;
+		this.oklchToLinearRGB();
+
+		if(this.inGamut(rgb_r_lin, rgb_g_lin, rgb_b_lin)){
+			return this.boundChromaToRgbGamutRecursive(l, h, c_mid, c_high);
+		}
+		else{
+			return this.boundChromaToRgbGamutRecursive(1, h, c_low, c_mid);
+		}
 	}
 
 	private function hexToRgb(){
@@ -405,12 +426,21 @@ class Oklab{
 	}
 
 	public function oklchToRgb(){
-		this.oklchToOklab();
-
+		this.oklchToHex();
 	}
 
 	public function oklchToHex(){
 		this.oklchToOklab();
+		this.oklabToHex();
+	}
+
+	public function oklabToRgb(){
+		this.oklabToHex();
+	}
+
+	public function oklabToHex(){
+		this.oklabToOklch();
+
 		this.oklabToNonLinearLms();
 		this.nonLinearLmsToLms();
 		this.lmsToXyz();
@@ -418,6 +448,20 @@ class Oklab{
 		this.linearRgbToNormalized();
 		this.normalizedToRgb();
 		this.rgbToHex();
+	}
+
+
+	public function oklchToLinearRGB(){
+		this.oklabToOklch();
+		this.oklabToNonLinearLms();
+		this.nonLinearLmsToLms();
+		this.lmsToXyz();
+		this.xyzToLinearRgb();
+	}
+
+	public function oklabToLinearRgb(){
+		this.oklabToOklch();
+		this.oklchToLinearRGB();
 	}
 
 	public function setRgb(r: Int = 0, g: Int = 0, b: Int = 0){
@@ -452,8 +496,8 @@ class Oklab{
 	public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
 		this.oklch_lr = lr;
 		this.oklch_l = whiteRefOkLightToNoWhiteRefOkLight(this.oklch_lr);
-		this.oklch_c = c;
 		this.oklch_h = h;
+		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, c, 20);
 		this.oklchToHex();
 	};
 
@@ -462,12 +506,9 @@ class Oklab{
 		this.oklab_l = whiteRefOkLightToNoWhiteRefOkLight(this.oklab_lr);
 		this.oklab_a = a;
 		this.oklab_b = b;
+		this.oklabToOklch();
+		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 		this.oklchToOklab();
 	}
-
-
-	
-
-
 
 }
