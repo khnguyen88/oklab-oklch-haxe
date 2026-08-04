@@ -1,0 +1,5 @@
+
+--cwd src
+--class-path src
+--main oklab.Run
+--interp
