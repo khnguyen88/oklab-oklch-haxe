@@ -189,15 +189,15 @@ class Oklab{
 	}
 
 	public function sanitizeHex(hex: String): String{
-		var santizedHex: String = "";
+		var sanitizedHex: String = "";
 		if(!this.isStartingCharPound(hex)){
-			santizedHex = "#" + hex;
+			sanitizedHex = "#" + hex;
 		}
 
-		if(!this.isValidHexAfterHash(hex)){
-			santizedHex = '#000000';
+		if(!this.isValidHexAfterHash(sanitizedHex)){
+			sanitizedHex = '#000000';
 		}
-		return santizedHex;
+		return sanitizedHex;
 	}
 
 	private static function rgbChannelToHex(channelVal: Int){
@@ -356,9 +356,9 @@ class Oklab{
 	}
 
 	private function lmsToXyz(){
-		this.rgb_r_lin = m1_x0 * this.xyz_x + m1_x1 * this.xyz_y + m1_x2 * this.xyz_z;
-		this.rgb_g_lin = m1_y0 * this.xyz_x + m1_y1 * this.xyz_y + m1_y2 * this.xyz_z;
-		this.rgb_b_lin = m1_z0 * this.xyz_x + m1_z1 * this.xyz_y + m1_z2 * this.xyz_z;
+		this.xyz_x = m1_inv_x0 * this.lms_l + m1_inv_x1 * this.lms_m + m1_inv_x2 * this.lms_s;
+		this.xyz_y = m1_inv_y0 * this.lms_l + m1_inv_y1 * this.lms_m + m1_inv_y2 * this.lms_s;
+		this.xyz_z = m1_inv_z0 * this.lms_l + m1_inv_z1 * this.lms_m + m1_inv_z2 * this.lms_s;
 	}
 
 	private function lmsToNonLinearLms(){
