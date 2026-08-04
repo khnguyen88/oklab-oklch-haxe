@@ -46,6 +46,19 @@ class Oklab{
 	public var oklch_c:Float;
 	public var oklch_h:Float;
 
+	// TRACE OUTPUT
+    // OKLAB
+	public var trace_oklab_l:Float;
+	public var trace_oklab_lr: Float;
+	public var trace_oklab_a:Float;
+	public var trace_oklab_b:Float;
+
+    // OKLCH
+	public var trace_oklch_l:Float;
+	public var trace_oklch_lr: Float;
+	public var trace_oklch_c:Float;
+	public var trace_oklch_h:Float;
+
 	public function new() {
 		this.hex="#FFFFFF";
 		this.hexToOklab();
@@ -466,13 +479,31 @@ class Oklab{
 		this.oklchToLinearRGB();
 	}
 
+	public function roundToDecimal(val: Float, decimalPlaces: Int = 2): Float{
+		var factOfTen = decimalPlaces * 10;
+		return (val * factOfTen) / factOfTen;
+	}
+
+	public function update_race_var(){
+
+		this.trace_oklab_l = roundToDecimal(this.oklab_l);
+		this.trace_oklab_lr = roundToDecimal(this.oklab_lr);
+		this.trace_oklab_a = roundToDecimal(this.oklab_a);
+		this.trace_oklab_b = roundToDecimal(this.oklab_b);
+
+		this.trace_oklch_l = roundToDecimal(this.oklch_l);
+		this.trace_oklch_lr = roundToDecimal(this.oklch_lr);
+		this.trace_oklch_c = roundToDecimal(this.oklch_c);
+		this.trace_oklch_h = roundToDecimal(this.oklch_h);
+	}
+
 	public function setRgb(r: Int = 0, g: Int = 0, b: Int = 0){
 		this.rgb_r = r;
 		this.rgb_g = g;
 		this.rgb_b = b;
 		this.rgbToOklab();
 		trace('[setRgb] rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b}) hex=${this.hex}');
-		trace('[setRgb] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
+		trace('[setRgb] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h})');
 	};
 
 
@@ -480,7 +511,7 @@ class Oklab{
 		this.hex = this.sanitizeHex(hex);
 		this.hexToOklab();
 		trace('[setHex] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
-		trace('[setHex] oklab=(${this.oklab_l}, ${this.oklab_a}, ${this.oklab_b}) oklch=(${this.oklch_l}, ${this.oklch_c}, ${this.oklch_h})');
+		trace('[setHex] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h})');
 	};
 
 	public function setOklch(l: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
