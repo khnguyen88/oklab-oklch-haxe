@@ -25,8 +25,8 @@ The module streamlines the process of converting the standard RGB (sRGB) color s
 1. sRGB color space to linear sRGB color space
 2. linear RGB color space to CIE-XYZ color space
 3. CIE-XYZ color space to LMS color space
-4. LMS color space to linear LMS color space
-5. linear LMS color space to OkKlab color space
+4. LMS color space to non-linear LMS color space (by applying cubic function, relates to )
+5. non-linear LMS color space to OkKlab color space
 6. Oklab color space (cartesian) <--> Oklch color space (polar)
 
 While most screens default to sRGB, different displays may use P3 Gamut or Rec2020 color spaces, which interpret RGB and its 0-255 color values differently and provide a richer, wider range of colors. In this case, different transformation matrices are required for P3 Gamut and Rec2020 to the CIE-XYZ color space. Dan Bruzo provides those matrices.
@@ -38,6 +38,8 @@ If you look at my source code, you will notice that the Oklab and Oklch variable
 - Oklab L = The lightness the color looks to humans, no matter the physical brightness. Lightness is the perceived brightness
 
 - Oklab Lr = The lightness adjusted to behave like CIELab inside a color picker.
+
+The relationship between L and Lr in Oklab/Oklch is an algberic formula used to shift the raw Oklab cublic relationship to match that of CIELAB'S L* / 100.
 
 This decision was made after reading one of Bjorn Ottosson's blogs on color pickers, and its section on a [new way to estimate lightness "L" for Oklab](https://bottosson.github.io/posts/colorpicker/#intermission---a-new-lightness-estimate-for-oklab)
 
@@ -127,10 +129,45 @@ CIE-XYZ color space is important because it is designed to match human vision an
 
 "Applying gamma" means simply using the gamma curve function to adjust the color channel values to match how people perceive them.
 
+### Lightness (L) and Luminance (Y)
+
+Lightness (L) is the human-visually perceived value of luminance of an object. This measurement is always relative to a reference white.
+
+Luminance (Y) is the true physical measured value of luminous intensity/brightness to an object.
+
+They share a cube-root relationship. Effectively, humans perceive the intensity of light as the power to the (1/3)—something 8 times the luminance is seen as twice as bright to us.
+
+This holds exactly for Oklab: for neutral grays, Oklab’s LMS-cube-root collapses cleanly to L = Y^(1/3), no offset or extra scaling — by design.
+
+It does NOT hold for CIE L\* and it’s color spaces and other which adds an offset or scaling to it.
+
+- CIE L* uses L* = 116·f(Y/Yn) − 16, f being a cube root above a small threshold (linear below it, near black).
+
+- Oklab’s L is the cube root of the LMS cone responses (post cone-space conversion), then recombined — not a direct cube root of Y. Hence why Oklab feels more naturally close to what we perceive.
+
+### Chroma (c) and Lightness (L) and Saturation (s)
+
+Chroma is the colorfulness or richeness of color. Chroma measures color's differences from a gray of the same lightness.
+
+Saturation is the ratio of Colorfulness divided by brightness or "Colorfulness of an area judged in proportion to its brightness."
+
+Chroma and Lightness shares a wedge relationship.
+
+Chroma converges to 0 when L = 0 (white) or L = 0 (black).
+
+As lightness on either end, L = 1 for pure white or L = 0 for pure black, approaches the cusp or peak, it increases in chroma. Max chroma/ peak varies and shifts depending on the hue.
+
+The peak shifts by hue. Yellow cusps near white (L≈0.97), blue cusps well below center (L≈0.45). Red, green, cyan, magenta all land somewhere between.
+
 ### Respecting the sRGB Gamut
 
-Oklch and Oklab
-When converting Oklch/Oklab back to sRGB
+Oklch and Oklab have a wider color gamut (color boundary) and a wider range of colors than sRGB.
+
+When converting Oklch/Oklab back to sRGB, we need to ensure we preserve the sRGB values. Chroma, c, or `sqrt( a^2 + b^2)`, colorfulness.
+
+To ensure we do, if a chroma value results in a linear sRGB value less than zero or greater than one for any of the channels, it means it is outside of the gamut; we need to adjust the chroma so that it stays within the boundary.
+
+We achieve this with a binary recursive search, iterating through the Oklch/Oklab to linear sRGB color space, and reducing or increasing the c value until all linear sRGB channels are bounded within the sRGB gamut.
 
 ## Resources / References
 
@@ -156,6 +193,12 @@ The science and math used to understand the Oklab and Oklch color space and impl
 
 - [Cambridge in Colour](https://www.cambridgeincolour.com/tutorials/gamma-correction.htm)
 - [Charles Poynton - Frequently Asked Questions about Gamma](https://www.poynton.ca/faq/gammafaq/GammaFAQ.pdf)
+
+- [Wikipedia - Colorfulness](https://en.wikipedia.org/wiki/Colorfulness)
+
+- [Peter Donahue - Saturation vs Chroma](https://petertdonahue.com/Saturation-vs-Chroma.html)
+
+-
 
 ### Programming Language
 
