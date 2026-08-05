@@ -154,7 +154,7 @@ class Oklab{
 	private static var m_inv_g1:Float = 1.8760396703202629;
 	private static var m_inv_g2:Float = 0.04143602416910443;
 
-	private static var m_inv_b0:Float = 0.04143602416910443;
+	private static var m_inv_b0:Float = 0.05566928820295223;
 	private static var m_inv_b1:Float = -0.20377796567354506;
 	private static var m_inv_b2:Float = 1.0574896845007096;
 
@@ -298,6 +298,12 @@ class Oklab{
 	}
 
 	private function boundChromaToRgbGamutRecursive(l: Float, h: Float, c_low: Float = 0.0, c_high: Float = 0.0, recDepth: Int = 20): Float{
+		this.oklch_l = l; this.oklch_h = h; this.oklch_c = c_high;
+		this.oklchToLinearRGB();
+		if (this.inGamut(this.rgb_r_lin, this.rgb_g_lin, this.rgb_b_lin)){
+			return c_high;
+		} 
+
 		if (recDepth <= 0 || (c_high - c_low) < 1e-4){
 			return c_low;
 		}
