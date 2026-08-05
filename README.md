@@ -8,11 +8,11 @@ WIP - Wrote the README.md and setup the project folder.
 
 ## Purpose
 
-This is a Haxe Oklab/Oklch utility conversion module/class.
+This is a Haxe Oklab Oklch utility conversion module/class. It also includes methods to convert to/from OkLrab and OkLrch.
 
 ## Inspiration
 
-This project was inspired by Alexei Boronine's [hsluv-haxe](https://github.com/hsluv/hsluv-haxe/tree/main) project. I was looking for an open-source project to contribute to and a peer, Isaac or logoooo (Discord), on my unviersity's CIS discord channel proposed I build a oklab/oklch module/library for the haxe programming language. He is pretty involved with the Haxe and Ceramic community and suggeted I make the contribution.
+This project was inspired by Alexei Boronine's [hsluv-haxe](https://github.com/hsluv/hsluv-haxe/tree/main) project. I was looking for an open-source project to contribute to, and a peer, Isaac or logoooo (Discord), on my university's CIS Discord channel proposed that I build an oklab/oklch module/library for the Haxe programming language. He is pretty involved with the Haxe and Ceramic community and suggested I contribute.
 
 Since I am an artist and have a fascination and appreciation for colors and color science, this was the perfect project for me. So here we are!
 
@@ -20,7 +20,7 @@ Since I am an artist and have a fascination and appreciation for colors and colo
 
 ### General Conversion Process
 
-The module simply streamline the process of transforming the standard RGB (sRGB) color space into the Oklab and Oklch color space. It just requires multiple steps. Bjorn Ottosson and Wikipedia, streamlined and merged the 2nd and 3rd steps together. So if you felt like a step was missing, that's why. I believe its to minimize rounding errors and improve rounding accuracy and precision and save time/steps. My code will account for all of the steps.
+The module streamlines the process of converting the standard RGB (sRGB) color space to the Oklab and Oklch color spaces. It just requires multiple steps. Bjorn Ottosson and Wikipedia streamlined and merged the 2nd and 3rd steps. So if you felt like a step was missing, that's why. I believe it's to minimize rounding errors, improve rounding accuracy and precision, and save time/steps. My code will account for all of the steps.
 
 1. sRGB color space to linear sRGB color space
 2. linear RGB color space to CIE-XYZ color space
@@ -29,33 +29,33 @@ The module simply streamline the process of transforming the standard RGB (sRGB)
 5. linear LMS color space to OkKlab color space
 6. Oklab color space (cartesian) <--> Oklch color space (polar)
 
-While most screen defaults to sRGB, different displays may use P3 Gamut or Rec2020 color spaces which interprets the RGB and its 0-255 color values differently, and provide a richer and wider range of colors. In this case, different transformation matrices is required for P3 Gamut ance Rec2020 to CIE-XYZ color space. Dan Bruzo provides those matrices.
+While most screens default to sRGB, different displays may use P3 Gamut or Rec2020 color spaces, which interpret RGB and its 0-255 color values differently and provide a richer, wider range of colors. In this case, different transformation matrices are required for P3 Gamut and Rec2020 to the CIE-XYZ color space. Dan Bruzo provides those matrices.
 
 ### Oklab and Oklch's L and Lr
 
-If you look at my source code you will notice that the Oklab and Oklch variables will have a "l" property and a "lr" property. These two properties refer to the "lightness" and "reference-white lightness".
+If you look at my source code, you will notice that the Oklab and Oklch variables will have an "l" property and a "lr" property. These two properties refer to the "lightness" and "reference-white lightness".
 
-- Oklab L = The lightness the color looks to humans, no matter the physical brightness. Lightness is the precieved brightness
+- Oklab L = The lightness the color looks to humans, no matter the physical brightness. Lightness is the perceived brightness
 
-- Oklab Lr = The lightness adjusted to behave like CIELab inside a color picker.”
+- Oklab Lr = The lightness adjusted to behave like CIELab inside a color picker.
 
-This decision was made after reading one of Bjorn Ottosson's blog on color picker and it's section on a [new way to estimate lightness "L" for Oklab](https://bottosson.github.io/posts/colorpicker/#intermission---a-new-lightness-estimate-for-oklab)
+This decision was made after reading one of Bjorn Ottosson's blogs on color pickers, and its section on a [new way to estimate lightness "L" for Oklab](https://bottosson.github.io/posts/colorpicker/#intermission---a-new-lightness-estimate-for-oklab)
 
-From what understand, in references to the sRGB conversion to RGB
+From what I understand, in reference to the sRGB conversion to RGB
 
 ### Whitepoint is not related to Lightness
 
-In one of Bjorn Ottosson's [Oklab blog](https://bottosson.github.io/posts/oklab/), he stated that "Oklab uses a D65 whitepoint, since this is what other common color spaces, like sRGB, uses". D65 and D50, refers to the hue of tint of white given the precieve temperture value of the light source. For example D65 means what is the precieved white at 6500K and D50 means what is the precieved what at 5000K. So depending on the white reference point we use, color values will shift slightly. It does not have anything to do with the precieve brightness or lightness of a color, including white.
+In one of Bjorn Ottosson's [Oklab blog](https://bottosson.github.io/posts/oklab/), he stated that "Oklab uses a D65 whitepoint, since this is what other common color spaces, like sRGB, use". D65 and D50 refer to the hue of tint of white given the perceived temperature value of the light source. For example, D65 means what the perceived white is at 6500K, and D50 means what the perceived white is at 5000K. So depending on the white reference point we use, color values will shift slightly. It does not have anything to do with the perceived brightness or lightness of a color, including white.
 
 ### Transformation Matrices (M1, M2, M3) and Precision
 
-Bjorn Ottosson and Wikipedia provided the steps, formulas, and transformation matrices (M1, M2) needed to convert the CIE-XYZ color space to the LMS color space and then to the OKLAB color space. The information specified by these two sources are used in the code.
+Bjorn Ottosson and Wikipedia provided the steps, formulas, and transformation matrices (M1, M2) needed to convert the CIE-XYZ color space to the LMS color space and then to the OKLAB color space. The information specified by these two sources is used in the code.
 
-To get to the CIE-XYZ color space from the sRGB color space, a transformation matrix, M, is required. This tranformation matrix, M, is standard and readily avaliable online, but varies in the level of precision depending on the source it was retrieved from.
+To get to the CIE-XYZ color space from the sRGB color space, a transformation matrix, M, is required. This transformation matrix, M, is standard and readily available online, but its precision varies depending on the source it was retrieved from.
 
 The transformation matrix, M, used in the code is derived from Bjorn Ottosson's other transformation matrices.
 
-In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-linear-srgb-to-oklab) that Bjorn Ottosson provided, he streamlined two conversion steps from linear RGB color space to CIE-XYZ color space and CIE-XYZ color space to LMS color space, by doing the product of the two tranformation matrices, M1_M. So,
+In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-linear-srgb-to-oklab) that Bjorn Ottosson provided, he streamlined two conversion steps from linear RGB color space to the CIE-XYZ color space and from the CIE-XYZ color space to the LMS color space by multiplying the two transformation matrices, M1_M. So,
 
 |     |     |     |     |     |
 | --- | --- | --- | --- | --- |
@@ -87,13 +87,13 @@ In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-li
 | m   | =   | M1_M | \*  |     | G'  |
 | s   |     |      |     |     | B'  |
 
-The issue is that Bjorn Ottosson never provided never provided the transformation matrix, M, that he used in his calculations or formula, but have stated his matrix have been dervied using a higher precision sRGB (transformation) matrix and exact matching D65.
+The issue is that Bjorn Ottosson never provided the transformation matrix, M, that he used in his calculations or formula. Still, he stated his matrix was derived using a higher-precision RGB (transformation) matrix and exact matching D65.
 
-Attempts to create values in Bjorn Ottosson's M_M1 transformation matrices, could not be replicated with other existing transformation matrix, M, found from other sources like **Alexi Boronine's hsluv-haxe**, **Imaging-Engineering** and **Wikipedia**, due to the differences in precision of the values in the matrix. Effectively, no two source for the sRGB to CIE-XYZ transformation matrix, M, with a standard illuminant of D65 will be the same. It appears to be very subjective based on who estimated it.
+Attempts to create values in Bjorn Ottosson’s M_M1 transformation matrices could not be replicated with other existing transformation matrices, M, found from other sources like Alexi Boronine’s hsluv-haxe, Imaging-Engineering, and Wikipedia, due to the differences in precision of the values in the matrix. Effectively, no two sources for the sRGB to CIE-XYZ transformation matrix, M, with a standard illuminant of D65 will be the same. It appears to be very subjective based on who estimated it.
 
-To best accurately obtain the transformation matrix M that Bjorn Ottosson would have used, it was simply derived using the known matrices, M1_M and M1 by multiplying the inverse of the M1 matrix with M1_M. Both M1_M and M1 matrices comes from Bjorn Ottosson and wikipedia. The [formula to find the unknown matrix of a given matrix multiplication equation](https://math.stackexchange.com/questions/350463/find-matrix-a-if-ab-c-and-b-and-c-are-known) comes from a Math Stack Exchange discussion. Note the order of matrices matter in matrix multiplication.
+To best accurately obtain the transformation matrix M that Bjorn Ottosson would have used, it was derived using the known matrices, M1_M and M1, by multiplying the inverse of the M1 matrix with M1_M. Both M1_M and M1 matrices come from Bjorn Ottosson and Wikipedia. The formula to find the unknown matrix of a given matrix multiplication equation comes from a Math Stack Exchange discussion. Note that the order of matrices matters in matrix multiplication.
 
-Given A, B, C are matrices with the same dimension...
+Given that A, B, and C are matrices with the same dimension…
 
 `A * B = C`
 
@@ -107,25 +107,30 @@ or...
 
 `M = M1^-1 * M_M1`
 
-The inverse matrix of M1 and M2 and the various matrices multiplication were calculated using [high precision matrix calculators developed and provided reshish](https://matrix.reshish.com/).
+The inverse matrices of M1 and M2 and the various matrix multiplications were calculated using [high-precision matrix calculators developed and provided by Reshish](https://matrix.reshish.com/).
 
-Values from the computed matrices were verified using Wolfram Alpha's calculator. Wolfram Alpha's estimate was not used because the results provided rounded and lower precision estimates.
+Values from the computed matrices were verified using Wolfram Alpha's calculator. Wolfram Alpha's estimate was not used because the results provided rounded, lower-precision estimates.
 
 ### Normalized sRGB and Linear sRGB, Apply Gamma vs Linearlize
 
-The most common representation of color is sRGB, or standard RGB. It is an additive color model. Starting from black, as you increase the value of each color channel it gets closer to white.
+The most common representation of color is sRGB, or standard RGB. It is an additive color model. Starting from black, as you increase the value of each color channel, it gets closer to white.
 
-sRGB colors are represented as non-linear 8-bit color depth, with value ranging from 0-255. sRGB colors naturally comes with the gamma function applied making it nonlinear. Each channel can range from a 0-255 color value. Non-linear in terms of sRGB is the approximate human brightness preciption of colors. It does not actually represent the actual physical light intensity just how we precieved it which is skewed.
+sRGB colors are represented as non-linear 8-bit color depth, with values ranging from 0-255. sRGB colors naturally come with the gamma function applied, making it nonlinear. Each channel can range from a 0-255 color value. Non-linear in terms of sRGB is the approximate human brightness perception of colors. It does not actually represent the actual physical light intensity; it is how we perceive it, which is skewed.
 
-Gamma is curve function applied to linear light, and intended to represent how human precieves the brightness of colors and thus different color channels. Human preciption of brightness tend to curve color towards dark tones or values since we're more sensitive to differences there. Gamma values tend to range from 0 to 1, hence why we need to remove the color bit depth by normalizing it or dividing each color channel over 255. Gamma curve function is the observed byproduct of CRT screen physically worked and how the human eyes precieves and response to it. Brightness is a power law of voltage, hence non-linear.
+Gamma is a curve function applied to linear light, and intended to represent how humans perceive the brightness of colors and thus different color channels. Human perception of brightness tends to curve color towards dark tones or values since we're more sensitive to differences there. Gamma values tend to range from 0 to 1, hence why we need to remove the color bit depth by normalizing it or dividing each color channel by 255. The gamma curve function is the observed byproduct of how CRT screens physically work and how the human eye perceives and responds to it. Brightness is a power law of voltage, hence non-linear.
 
-Linear light basically the physical intensity of light, relative to photon count or amount of light avaliable (of each color channel). Aka photon count / amount of light available, per color channel. This conversion is needed before applying matrix computation with a transformation matrix to change it to a different color space. Aka sRGB -> CIE-XYZ.
+Linear light basically the physical intensity of light, relative to photon count or amount of light available (of each color channel). Aka photon count/amount of light available, per color channel. This conversion is needed before applying matrix computation with a transformation matrix to change it to a different color space. Aka sRGB -> CIE-XYZ.
 
-CIE-XYZ color space is important because it designed to match human vision and descibes how humans see color, by observing and recording how they matched colors. Where Y represent brightness, and X and Z represents the red/green/blue responses. It is use as the base and intermediate color space before we shift to a different color space. It requires the sRGB color channels to be linearized.
+CIE-XYZ color space is important because it is designed to match human vision and describes how humans see color by observing and recording how they matched colors. Where Y represents brightness, and X and Z represent the red/green/blue responses. It is used as the base and intermediate color space before we shift to a different color space. It requires the sRGB color channels to be linearized.
 
-"Removing gamma from the sRGB data" or "linearizing the sRGB data" means the same thing. We remove the gamma curve function from the color channel and transform it what it physical represent.
+"Removing gamma from the sRGB data" or "linearizing the sRGB data" means the same thing. We remove the gamma curve function from the color channel and transform it into what it physically represents.
 
-"Applying gamma" means to simply using utilizing gamma curve function to adjust the color channel values into how is precieved by people.
+"Applying gamma" means simply using the gamma curve function to adjust the color channel values to match how people perceive them.
+
+### Respecting the sRGB Gamut
+
+Oklch and Oklab
+When converting Oklch/Oklab back to sRGB
 
 ## Resources / References
 
