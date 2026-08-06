@@ -14,7 +14,7 @@ class Run {
 		var fromOklab = new Oklab();
 		fromOklab.setOklab(0.7, 0.1, 0.1);
 
-		trace("---- setOklch(0.75, 0.15, 1.5) ----");
+		trace("---- setOklch(0.75, 0.15, 1.5) / oklch.com match check --------");
 		var fromOklch = new Oklab();
 		fromOklch.setOklch(0.75, 0.15, 1.5);
 
