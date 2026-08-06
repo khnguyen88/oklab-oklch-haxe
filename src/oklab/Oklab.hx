@@ -264,7 +264,8 @@ class Oklab{
 	}
 
 	private static function linearLmsConeToNonLinear(cone: Float){
-		return Math.pow(cone, (1/3));
+		//Cubic root of negative X is equal to negative cubic root of X
+		return cone < 0 ? -Math.pow(-cone, (1/3)) : Math.pow(cone, (1/3));
 	}
 
 	private static function nonLinearLmsConeToLinear(nonLinCone: Float){
@@ -374,6 +375,13 @@ class Oklab{
 		this.lms_l = m1_x0 * this.xyz_x + m1_x1 * this.xyz_y + m1_x2 * this.xyz_z;
 		this.lms_m = m1_y0 * this.xyz_x + m1_y1 * this.xyz_y + m1_y2 * this.xyz_z;
 		this.lms_s = m1_z0 * this.xyz_x + m1_z1 * this.xyz_y + m1_z2 * this.xyz_z;
+	}
+
+	public function xyzToOklab(){
+		this.xyzToLms();
+		this.lmsToNonLinearLms();
+		this.nonLinearLmsToOklab();
+		this.oklabToOklch();
 	}
 
 	private function lmsToXyz(){

@@ -21,6 +21,7 @@ class RunTests {
         testOklchToRgb(snap.oklchToRgb);
         testRoundTrips(snap.roundTrips);
         testEdgeCases(snap.edgeCases);
+        testXyzToOklab();
 
         trace('--- ${passed} passed, ${failures} failed ---');
         Sys.exit(failures == 0 ? 0 : 1);
@@ -28,6 +29,30 @@ class RunTests {
 
     static function approxEq(a:Float, b:Float, eps:Float = 1e-5):Bool {
         return Math.abs(a - b) <= eps;
+    }
+
+    // Reference XYZ -> Oklab pairs from Björn Ottosson's Oklab post (rounded to 3 decimals).
+    static var xyzOklabRef:Array<Array<Float>> = [
+        [0.950, 1.000, 1.089, 1.000, 0.000, 0.000],
+        [1.000, 0.000, 0.000, 0.450, 1.236, -0.019],
+        [0.000, 1.000, 0.000, 0.922, -0.671, 0.263],
+        [0.000, 0.000, 1.000, 0.153, -1.415, -0.449],
+    ];
+
+    static function testXyzToOklab() {
+        for (c in xyzOklabRef) {
+            var o = new Oklab();
+            o.xyz_x = c[0];
+            o.xyz_y = c[1];
+            o.xyz_z = c[2];
+            o.xyzToOklab();
+            // tolerance 1e-3 because reference table is rounded to 3 decimals
+            var ok = approxEq(o.oklab_l, c[3], 1e-3)
+                && approxEq(o.oklab_a, c[4], 1e-3)
+                && approxEq(o.oklab_b, c[5], 1e-3);
+            check('xyzToOklab (${c[0]},${c[1]},${c[2]})', ok,
+                'got (${o.oklab_l},${o.oklab_a},${o.oklab_b}) expected (${c[3]},${c[4]},${c[5]})');
+        }
     }
 
     static function rgbEq(a:Array<Int>, b:Array<Int>, tol:Int = 1):Bool {
