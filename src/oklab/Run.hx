@@ -25,5 +25,13 @@ class Run {
 		trace("---- setOkLrab(0.8, 0.1, 0.1) ----");
 		var fromOklrab = new Oklab();
 		fromOklrab.setOkLrab(0.8, 0.1, 0.1);
+
+		trace("---- setOklch(0.74, 0.1, 188) / oklch.com match check ----");
+		var fromOklch = new Oklab();
+		fromOklch.setOklch(0.74, 0.1, 188);
+
+		trace("---- setOklch(0.4837, 0.0516, 274.54) / oklch.com match check ----");
+		var fromOklch = new Oklab();
+		fromOklch.setOklch(0.4837, 0.0516, 274.54);
 	}
 }

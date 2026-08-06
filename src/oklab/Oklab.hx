@@ -45,6 +45,8 @@ class Oklab{
 	public var oklch_lr: Float;
 	public var oklch_c:Float;
 	public var oklch_h:Float;
+	public var oklch_h_deg:Float;
+
 
 	// TRACE OUTPUT
     // OKLAB
@@ -420,11 +422,13 @@ class Oklab{
 		this.oklch_lr = this.oklab_lr;
 		this.oklch_c = Math.sqrt(Math.pow(this.oklab_a, 2) + Math.pow(this.oklab_b, 2));
 		this.oklch_h = Math.atan2(this.oklab_b, this.oklab_a);
+		this.oklch_h_deg = this.oklch_h * (180 / Math.PI);
 	}
 
 	private function oklchToOklab(){
 		this.oklab_l = this.oklch_l;
 		this.oklab_lr = this.oklch_lr;
+		this.oklch_h = this.oklch_h_deg * Math.PI / 180;
 		this.oklab_a = this.oklch_c * Math.cos(this.oklch_h);
 		this.oklab_b = this.oklch_c * Math.sin(this.oklch_h);
 	}
@@ -534,7 +538,7 @@ class Oklab{
 		this.oklch_l = l;
 		this.oklch_lr = noWhiteRefOkLightToWhiteRefOkLight(l);
 		this.oklch_c = c;
-		this.oklch_h = h;
+		this.oklch_h_deg = h;
 		this.oklchToOklab();
 		this.update_trace_var();
 		trace('[setOklch] oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h}) oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b})');
@@ -560,7 +564,7 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 		this.oklch_l = whiteRefOkLightToNoWhiteRefOkLight(lr);
 		this.oklch_lr = lr;
 		this.oklch_c = c;
-		this.oklch_h = h;
+		this.oklch_h_deg = h;
 		this.oklchToOklab();
 		this.update_trace_var();
 		trace('[setOklch] oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h}) oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b})');
