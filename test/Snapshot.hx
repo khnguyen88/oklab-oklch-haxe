@@ -36,14 +36,15 @@ class Snapshot {
                 rgb: rgb,
                 oklab: [round(o.oklab_l), round(o.oklab_a), round(o.oklab_b)],
                 oklch: [round(o.oklch_l), round(o.oklch_c), round(o.oklch_h)],
+                oklch_h_deg: round(o.oklch_h_deg),
                 hex: o.hex
             });
         }
 
-        // 2. OKLCH -> RGB over a grid of L, C, H.
+        // 2. OKLCH -> RGB over a grid of L, C, H (hue in degrees, matching setOklch API).
         var lVals = [0.0, 0.25, 0.5, 0.75, 1.0];
         var cVals = [0.0, 0.1, 0.2, 0.3];
-        var hVals = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.14159];
+        var hVals = [0.0, 45.0, 90.0, 135.0, 180.0, 225.0, 270.0, 315.0, 360.0];
         for (l in lVals) {
             for (c in cVals) {
                 for (h in hVals) {
@@ -58,12 +59,12 @@ class Snapshot {
             }
         }
 
-        // 3. Round-trips: RGB -> OKLCH -> RGB.
+        // 3. Round-trips: RGB -> OKLCH -> RGB. setOklch takes hue in degrees.
         for (rgb in allRgb) {
             var o = new Oklab();
             o.setRgb(rgb[0], rgb[1], rgb[2]);
-            var l = o.oklch_l, c = o.oklch_c, h = o.oklch_h;
-            o.setOklch(l, c, h);
+            var l = o.oklch_l, c = o.oklch_c, hDeg = o.oklch_h_deg;
+            o.setOklch(l, c, hDeg);
             var maxErr = Math.max(Math.max(
                 Math.abs(o.rgb_r - rgb[0]),
                 Math.abs(o.rgb_g - rgb[1])),

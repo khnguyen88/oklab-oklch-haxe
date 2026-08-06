@@ -99,8 +99,8 @@ class RunTests {
         for (c in cases) {
             var o = new Oklab();
             o.setRgb(c.rgb[0], c.rgb[1], c.rgb[2]);
-            var l = o.oklch_l, ch = o.oklch_c, h = o.oklch_h;
-            o.setOklch(l, ch, h);
+            var l = o.oklch_l, ch = o.oklch_c, hDeg = o.oklch_h_deg;
+            o.setOklch(l, ch, hDeg);
             var ok = rgbEq([o.rgb_r, o.rgb_g, o.rgb_b], c.rgb, 2);
             check('roundTrip ${c.rgb} (maxErr=${c.maxErr})', ok,
                 'got back (${o.rgb_r},${o.rgb_g},${o.rgb_b})');
