@@ -8,16 +8,17 @@ This is a Haxe Oklab Oklch utility conversion module/class. It also includes met
 
 ## How to use
 
-### STEPS 
+### STEPS
+
 1. IMPORT MODULE
 
 1. SET THE INITIAL COLOR VALUES
     - CONVERSION IS AUTOMATED UNDER THE HOOD
 
-2. PULLOUT AND INDIVIDUAL VALUES
-
+1. PULLOUT INDIVIDUAL VALUES
 
 ### Import the `oklab` module
+
 ```hx
 package oklab;
 ```
@@ -73,18 +74,64 @@ var fromOklch = new Oklab();
 fromOklch.setOklch(0.75, 0.15, 1.5);
 
 //Output
-// [setOklrch] oklch=(0.828, 0.12, 2) oklab=(0.828, 0.12, 0.004)
-// [setOklrch] hex=#FFABC1 rgb=(255,171,193)
+// [setOkLrch] oklab=(0.828, 0.12, 0.004) oklch=(0.828, 0.12, 2)
+// [setOkLrch] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.
+// [setOkLrch] bounded_oklab=(0.828, 0.102, 0.004) bounded_oklch=(0.828, 0.102, 2)
+// [setOkLrch] hex=#FFABC1 rgb=(255,171,193)
 ```
 
 ### Set the Oklrab values
+
 ```hx
 var fromOklrab = new Oklab();
 fromOklrab.setOkLrab(0.8, 0.1, 0.1);
 
 //Output
-// [setOklrab] oklab=(1, 0, 0) oklch=(1, 0, 89.876)
-// [setOklrab] hex=#FFFFFF rgb=(255,255,255)
+// [setOkLrab] oklab=(0.828, 0.1, 0.1) oklch=(0.828, 0.141, 45)
+// [setOkLrab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to nearest sRGB.
+// [setOkLrab] bounded_oklab=(0.828, 0.072, 0.072) bounded_oklch=(0.828, 0.102, 45)
+// [setOkLrab] hex=#FFB28F rgb=(255,178,143)
+```
+
+### Pull out individual values
+
+```hx
+trace("---- getHex() ----");
+var hex = fromOklrch.getHex();
+trace("hex: " + hex);
+
+trace("---- getRgb() ----");
+var rgb = fromOklrch.getRgb();
+trace("rgb: " +rgb);
+
+trace("---- getLinRgb() ----");
+var rgb_lin = fromOklrch.getLinRgb();
+trace("rgb_lin: " + rgb_lin);
+
+trace("---- getOklab() ----");
+var oklab = fromOklrch.getOklab();
+trace("oklab: " + oklab);
+
+trace("---- getOklch() ----");
+var oklch = fromOklrch.getOklch();
+trace("oklch: " + oklch);
+
+
+//Output
+// ---- getHex() ----
+// hex: #FFABC1
+
+// ---- getRgb() ----
+// rgb: {g: 171, b: 193, r: 255}
+
+// ---- getLinRgb() ----
+// rgb_lin: {g: 0.40563235477248683, b: 0.53571915944501358, r: 0.99992863463377935}
+
+// ---- getOklab() ----
+// oklab: {lr: 0.8, l: 0.828132430218386, a: 0.10235948236109645, b: 0.0035744718888264665}
+
+// ---- getOklch() ----
+// oklch: {lr: 0.8, l: 0.828132430218386, c: 0.102421875, h: 0.034906585039886591}
 ```
 
 ## Inspiration
@@ -333,6 +380,6 @@ In addition to Haxe's own documentation, I used Alexei's hsluv-haxe as a resourc
 
 I am not an expert in color science or color theory, but I do appreciate it and I enjoy learning. I don't have everything fully grasp but I'm doing my best to get there. If you spot anything factually in correct.
 
-A LLM (GLM 5.1) was used sparingly towards the end to generate the build files and the snapshot and test cases and files in order to save time. The other time the LLM was used was to help pinpoint one bug, the negative cubic root error , that I could not figure out on my own. That's it.
+A LLM (GLM 5.1) was used sparingly towards the end to generate the build filesa and the snapshot and test files and convert all my variables to snake_case in order to save time. The other time the LLM was used was to help pinpoint one bug, the negative cubic root error , that I could not figure out on my own. That's it.
 
 I wrote everything else.

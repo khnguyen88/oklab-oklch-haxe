@@ -41,5 +41,26 @@ class Run {
 		var fromOklch = new Oklab();
 		fromOklch.setOklch(0.4837, 0.0516, 274.54);
 		trace("");
+
+
+		trace("---- getHex() ----");
+		var hex = fromOklrch.getHex();
+		trace("hex: " + hex);
+
+		trace("---- getRgb() ----");
+		var rgb = fromOklrch.getRgb();
+		trace("rgb: " +rgb);
+
+		trace("---- getLinRgb() ----");
+		var rgb_lin = fromOklrch.getLinRgb();
+		trace("rgb_lin: " + rgb_lin);
+
+		trace("---- getOklab() ----");
+		var oklab = fromOklrch.getOklab();
+		trace("oklab: " + oklab);
+
+		trace("---- getOklch() ----");
+		var oklch = fromOklrch.getOklch();
+		trace("oklch: " + oklch);
 	}
 }

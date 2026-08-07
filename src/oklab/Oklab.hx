@@ -2,65 +2,65 @@ package oklab;
 
 class Oklab{
 	// HEX
-    public var hex:String;
+    private var hex:String;
 
     // RGB
-	public var rgb_r:Int;
-	public var rgb_g:Int;
-	public var rgb_b:Int;
+	private var rgb_r:Int;
+	private var rgb_g:Int;
+	private var rgb_b:Int;
 
     // NORMALIZED RGB (W/ GAMMA)
-	public var rgb_r_norm:Float;
-	public var rgb_g_norm:Float;
-	public var rgb_b_norm:Float;
+	private var rgb_r_norm:Float;
+	private var rgb_g_norm:Float;
+	private var rgb_b_norm:Float;
 
     // LINEAR RGB (W/O GAMMA)
-	public var rgb_r_lin:Float;
-	public var rgb_g_lin:Float;
-	public var rgb_b_lin:Float;
+	private var rgb_r_lin:Float;
+	private var rgb_g_lin:Float;
+	private var rgb_b_lin:Float;
 
 	// CIE XYZ (LINEAR)
-	public var xyz_x:Float;
-	public var xyz_y:Float;
-	public var xyz_z:Float;
+	private var xyz_x:Float;
+	private var xyz_y:Float;
+	private var xyz_z:Float;
 
 	// LMS (LINEAR)
-	public var lms_l:Float;
-	public var lms_m:Float;
-	public var lms_s:Float;
+	private var lms_l:Float;
+	private var lms_m:Float;
+	private var lms_s:Float;
 
 	// LMS' (NON_LINEAR)
-	public var lms_l_nl:Float;
-	public var lms_m_nl:Float;
-	public var lms_s_nl:Float;
+	private var lms_l_nl:Float;
+	private var lms_m_nl:Float;
+	private var lms_s_nl:Float;
 
     // OKLAB
-	public var oklab_l:Float;
-	public var oklab_lr: Float;
-	public var oklab_a:Float;
-	public var oklab_b:Float;
+	private var oklab_l:Float;
+	private var oklab_lr: Float;
+	private var oklab_a:Float;
+	private var oklab_b:Float;
 
     // OKLCH
-	public var oklch_l:Float;
-	public var oklch_lr: Float;
-	public var oklch_c:Float;
-	public var oklch_h:Float;
-	public var oklch_h_deg:Float;
+	private var oklch_l:Float;
+	private var oklch_lr: Float;
+	private var oklch_c:Float;
+	private var oklch_h:Float;
+	private var oklch_h_deg:Float;
 
 
 	// TRACE OUTPUT
     // OKLAB
-	public var trace_oklab_l:Float;
-	public var trace_oklab_lr: Float;
-	public var trace_oklab_a:Float;
-	public var trace_oklab_b:Float;
+	private var trace_oklab_l:Float;
+	private var trace_oklab_lr: Float;
+	private var trace_oklab_a:Float;
+	private var trace_oklab_b:Float;
 
     // OKLCH
-	public var trace_oklch_l:Float;
-	public var trace_oklch_lr: Float;
-	public var trace_oklch_c:Float;
-	public var trace_oklch_h:Float;
-	public var trace_oklch_h_deg:Float;
+	private var trace_oklch_l:Float;
+	private var trace_oklch_lr: Float;
+	private var trace_oklch_c:Float;
+	private var trace_oklch_h:Float;
+	private var trace_oklch_h_deg:Float;
 
 	public function new() {
 		this.hex="#FFFFFF";
@@ -187,7 +187,7 @@ class Oklab{
 	//Conversion Functions
 	private static inline final HEX_CHAR = '0123456789ABCDEF';
 
-	public function isStartingCharPound(s:String): Bool{
+	private function isStartingCharPound(s:String): Bool{
 		if(s.length > 0 && s.charAt(0) == "#"){
 			return true;
 		}
@@ -196,7 +196,7 @@ class Oklab{
 		}
 	}
 
-	public function isValidHexAfterHash(hex:String):Bool {
+	private function isValidHexAfterHash(hex:String):Bool {
 		for (i in 1 ... hex.length) {
 			var c = hex.charAt(i);
 			if (HEX_CHAR.indexOf(c) == -1) return false;
@@ -204,7 +204,7 @@ class Oklab{
 		return true;
 	}
 
-	public function sanitizeHex(hex: String): String{
+	private function sanitizeHex(hex: String): String{
 		var sanitized_hex: String = hex;
 		if(!this.isStartingCharPound(hex)){
 			sanitized_hex = "#" + hex;
@@ -384,7 +384,7 @@ class Oklab{
 		this.lms_s = m1_z0 * this.xyz_x + m1_z1 * this.xyz_y + m1_z2 * this.xyz_z;
 	}
 
-	public function xyzToOklab(){
+	private function xyzToOklab(){
 		this.xyzToLms();
 		this.lmsToNonLinearLms();
 		this.nonLinearLmsToOklab();
@@ -504,12 +504,12 @@ class Oklab{
 		this.oklchToLinearRGB();
 	}
 
-	public function roundToDecimal(val: Float, decimal_places: Int = 3): Float{
+	private function roundToDecimal(val: Float, decimal_places: Int = 3): Float{
 		var fact_of_ten = Math.pow(10, decimal_places);
 		return Math.round(val * fact_of_ten) / fact_of_ten;
 	}
 
-	public function updateTraceVars(){
+	private function updateTraceVars(){
 		this.updateTraceVarsOklab();
 		this.updateTraceVarsOklch();
 	}
@@ -553,28 +553,6 @@ class Oklab{
 		trace('[setHex] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 	};
 
-	public function setOklch(l: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
-		this.oklch_l = l;
-		this.oklch_lr = noWhiteRefOkLightToWhiteRefOkLight(l);
-		this.oklch_c = c;
-		this.oklch_h_deg = h;
-		this.oklchToOklab();
-		this.updateTraceVars();
-
-		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-
-		if(this.isChromaBoundingReq()){
-			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');
-			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
-			this.oklchToOklab();
-			this.updateTraceVars();
-			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-		};
-
-		this.oklchToHex();
-		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
-	};
-
 	public function setOklab(l: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
 		this.oklab_l = l;
 		this.oklab_lr = noWhiteRefOkLightToWhiteRefOkLight(this.oklab_l);
@@ -596,8 +574,29 @@ class Oklab{
 		this.oklchToHex();
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
+	public function setOklch(l: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
+		this.oklch_l = l;
+		this.oklch_lr = noWhiteRefOkLightToWhiteRefOkLight(l);
+		this.oklch_c = c;
+		this.oklch_h_deg = h;
+		this.oklchToOklab();
+		this.updateTraceVars();
 
-public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
+		trace('[setOklch] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+
+		if(this.isChromaBoundingReq()){
+			trace('[setOklch] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');
+			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			this.oklchToOklab();
+			this.updateTraceVars();
+			trace('[setOklch] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		};
+
+		this.oklchToHex();
+		trace('[setOklch] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
+	};
+
+	public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
 		this.oklch_l = whiteRefOkLightToNoWhiteRefOkLight(lr);
 		this.oklch_lr = lr;
 		this.oklch_c = c;
@@ -605,18 +604,18 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 		this.oklchToOklab();
 		this.updateTraceVars();
 
-		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		trace('[setOkLrch] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 
 		if(this.isChromaBoundingReq()){
-			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');
+			trace('[setOkLrch] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');
 			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 			this.oklchToOklab();
 			this.updateTraceVars();
-			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+			trace('[setOkLrch] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 		};
 
 		this.oklchToHex();
-		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
+		trace('[setOkLrch] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	};
 
 	public function setOkLrab(lr: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
@@ -627,18 +626,37 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 		this.oklabToOklch();
 		this.updateTraceVars();
 
-		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		trace('[setOkLrab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 
 		if(this.isChromaBoundingReq()){
-			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to nearest sRGB.');			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			trace('[setOkLrab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to nearest sRGB.');			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 			this.oklchToOklab();
 			this.updateTraceVars();
-			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+			trace('[setOkLrab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 		};
 
 		this.oklchToHex();
-		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
+		trace('[setOkLrab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
 
+	public function getHex(){
+		return this.hex;
+	}
+
+	public function getRgb(){
+		return {r: this.rgb_r, g: this.rgb_g, b: this.rgb_b};
+	}
+
+	public function getLinRgb(){
+		return {r: this.rgb_r_lin, g: this.rgb_g_lin, b: this.rgb_b_lin};
+	}
+
+	public function getOklab(){
+		return {l: this.oklab_l,  lr: this.oklab_lr, a: this.oklab_a, b: this.oklab_b};
+	}
+
+	public function getOklch(){
+		return {l: this.oklch_l, lr: this.oklch_lr, c: this.oklch_c, h: this.oklch_h};
+	}
 }
