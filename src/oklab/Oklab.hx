@@ -68,7 +68,7 @@ class Oklab{
 	}
 
     // Transformation Matrices
-	// Transformation matrix, M1_M. For conversion from RGB' (Linear RGB) to OKLAB. Source Ottoson.
+	// Transformation matrix, M1_M. For conversion from RGB' (Linear RGB) to OKLAB. Source Ottosson.
     private static var m1_m_r0:Float = 0.4122214708;
 	private static var m1_m_r1:Float = 0.5363325363;
 	private static var m1_m_r2:Float = 0.0514459929;
@@ -163,22 +163,22 @@ class Oklab{
 
 	//Parser Functions
 	private static function parseHexByChannel(hex: String, channel: String = ''){
-		var hexWithoutPound = hex;
-		var hashIndex = hex.indexOf('#');
-		if(hashIndex != -1){
-			hexWithoutPound = hex.substring(hashIndex + 1);
+		var hex_without_pound = hex;
+		var hash_index = hex.indexOf('#');
+		if(hash_index != -1){
+			hex_without_pound = hex.substring(hash_index + 1);
 		}
-		if(hexWithoutPound.length != 6){
+		if(hex_without_pound.length != 6){
 			return '';
 		}
 
 		switch(channel){
 			case 'r', 'R', 'red', 'Red':
-				return hexWithoutPound.substring(0, 2);
+				return hex_without_pound.substring(0, 2);
 			case 'g', 'G', 'green', 'Green':
-				return hexWithoutPound.substring(2, 4);
-			case 'b', 'B', 'blue', 'Blue':			
-				return hexWithoutPound.substring(4, 6);
+				return hex_without_pound.substring(2, 4);
+			case 'b', 'B', 'blue', 'Blue':
+				return hex_without_pound.substring(4, 6);
 			case _:
 				return '';
 		}
@@ -205,65 +205,65 @@ class Oklab{
 	}
 
 	public function sanitizeHex(hex: String): String{
-		var sanitizedHex: String = hex;
+		var sanitized_hex: String = hex;
 		if(!this.isStartingCharPound(hex)){
-			sanitizedHex = "#" + hex;
+			sanitized_hex = "#" + hex;
 		}
 
-		if(!this.isValidHexAfterHash(sanitizedHex)){
-			sanitizedHex = '#000000';
+		if(!this.isValidHexAfterHash(sanitized_hex)){
+			sanitized_hex = '#000000';
 		}
-		return sanitizedHex;
+		return sanitized_hex;
 	}
 
-	private static function rgbChannelToHex(channelVal: Int){
-		var firstHexCharInd = Std.int(Math.floor(channelVal / 16));
-		var secondHexCharInd = channelVal % 16;
-		var hexVal = HEX_CHAR.charAt(firstHexCharInd) + HEX_CHAR.charAt(secondHexCharInd);
-		return hexVal;
+	private static function rgbChannelToHex(channel_val: Int){
+		var first_hex_char_ind = Std.int(Math.floor(channel_val / 16));
+		var second_hex_char_ind = channel_val % 16;
+		var hex_val = HEX_CHAR.charAt(first_hex_char_ind) + HEX_CHAR.charAt(second_hex_char_ind);
+		return hex_val;
 	}
 
-	private static function hexToRGBChannel(hexVal: String){
-		var firstHexChar = hexVal.charAt(0);
-		var firstHexCharInd = HEX_CHAR.indexOf(firstHexChar); 
-		var secondHexChar = hexVal.charAt(1);
-		var secondHexCharInd = HEX_CHAR.indexOf(secondHexChar);
-		var rgbChannelVal = firstHexCharInd * 16 + secondHexCharInd;
-		return rgbChannelVal;
+	private static function hexToRGBChannel(hex_val: String){
+		var first_hex_char = hex_val.charAt(0);
+		var first_hex_char_ind = HEX_CHAR.indexOf(first_hex_char);
+		var second_hex_char = hex_val.charAt(1);
+		var second_hex_char_ind = HEX_CHAR.indexOf(second_hex_char);
+		var rgb_channel_val = first_hex_char_ind * 16 + second_hex_char_ind;
+		return rgb_channel_val;
 	}
 
-	private static function rgbChannelToNormialized(channelVal: Int){
-		return channelVal / 255.0;
+	private static function rgbChannelToNormialized(channel_val: Int){
+		return channel_val / 255.0;
 	}
 
-	private static function normalizedToRgbChannel(channelVal: Float){
-		return Math.round(channelVal * 255.0);
+	private static function normalizedToRgbChannel(channel_val: Float){
+		return Math.round(channel_val * 255.0);
 	}
 
-	private static function normalizedRgbChannelToLinear(normVal: Float){
-		var linVal: Float;
+	private static function normalizedRgbChannelToLinear(norm_val: Float){
+		var lin_val: Float;
 
-		if(normVal <= 0.0405){
-			linVal = normVal / 12.92;
-		}
-		else{
-			linVal = Math.pow(((normVal + 0.055)/1.055), 2.4);
-		}
-
-		return linVal;
-	}
-
-	private static function linearRgbChannelToNormalized(linVal: Float){
-		var normVal: Float;
-
-		if(linVal <= 0.0031308){
-			normVal = linVal * 12.92;
+		if(norm_val <= 0.0405){
+			lin_val = norm_val / 12.92;
 		}
 		else{
-			normVal = 1.055 * Math.pow(linVal, (1/2.4)) - 0.055;
+			lin_val = Math.pow(((norm_val + 0.055)/1.055), 2.4);
 		}
-	
-		return normVal;
+
+		return lin_val;
+	}
+
+	private static function linearRgbChannelToNormalized(lin_val: Float){
+		var norm_val: Float;
+
+		if(lin_val <= 0.0031308){
+			norm_val = lin_val * 12.92;
+		}
+		else{
+			norm_val = 1.055 * Math.pow(lin_val, (1/2.4)) - 0.055;
+		}
+
+		return norm_val;
 	}
 
 	private static function linearLmsConeToNonLinear(cone: Float){
@@ -271,19 +271,19 @@ class Oklab{
 		return cone < 0 ? -Math.pow(-cone, (1/3)) : Math.pow(cone, (1/3));
 	}
 
-	private static function nonLinearLmsConeToLinear(nonLinCone: Float){
-		return nonLinCone * nonLinCone * nonLinCone;
+	private static function nonLinearLmsConeToLinear(non_lin_cone: Float){
+		return non_lin_cone * non_lin_cone * non_lin_cone;
 	}
 
 	private static function noWhiteRefOkLightToWhiteRefOkLight(l: Float){
 		var k1: Float = 0.206;
 		var k2: Float = 0.03;
 		var k3: Float = (1 + k1) / (1 + k2);
-		var eqSegment1: Float = k3 * l - k1;
-		var eqSegment2a: Float = Math.pow((k3 * l) - k1, 2);
-		var eqSegment2b: Float = 4 * k2 * k3 * l;
-		var eqSegment2: Float = Math.sqrt (eqSegment2a + eqSegment2b);
-		var lr = (eqSegment1 + eqSegment2) / 2;
+		var eq_segment_1: Float = k3 * l - k1;
+		var eq_segment_2a: Float = Math.pow((k3 * l) - k1, 2);
+		var eq_segment_2b: Float = 4 * k2 * k3 * l;
+		var eq_segment_2: Float = Math.sqrt (eq_segment_2a + eq_segment_2b);
+		var lr = (eq_segment_1 + eq_segment_2) / 2;
 		return lr;
 	}
 
@@ -291,9 +291,9 @@ class Oklab{
 		var k1: Float = 0.206;
 		var k2: Float = 0.03;
 		var k3: Float = (1 + k1) / (1 + k2);
-		var eqSegment1: Float = lr * (lr + k1);
-		var eqSegment2: Float = k3 * (lr + k2);
-		var l = eqSegment1 / eqSegment2;
+		var eq_segment_1: Float = lr * (lr + k1);
+		var eq_segment_2: Float = k3 * (lr + k2);
+		var l = eq_segment_1 / eq_segment_2;
 		return l;
 	}
 
@@ -301,14 +301,14 @@ class Oklab{
 		return (r_lin >= 0 && r_lin <= 1 && g_lin >= 0 && g_lin <=1 && b_lin >= 0 && b_lin <= 1);
 	}
 
-	private function boundChromaToRgbGamutRecursive(l: Float, h: Float, c_low: Float = 0.0, c_high: Float = 0.0, recDepth: Int = 20): Float{
+	private function boundChromaToRgbGamutRecursive(l: Float, h: Float, c_low: Float = 0.0, c_high: Float = 0.0, rec_depth: Int = 20): Float{
 		this.oklch_l = l; this.oklch_h = h; this.oklch_c = c_high;
 		this.oklchToLinearRGB();
 		if (this.inGamut(this.rgb_r_lin, this.rgb_g_lin, this.rgb_b_lin)){
 			return c_high;
-		} 
+		}
 
-		if (recDepth <= 0 || (c_high - c_low) < 1e-4){
+		if (rec_depth <= 0 || (c_high - c_low) < 1e-4){
 			return c_low;
 		}
 
@@ -319,10 +319,10 @@ class Oklab{
 		this.oklchToLinearRGB();
 
 		if(this.inGamut(rgb_r_lin, rgb_g_lin, rgb_b_lin)){
-			return this.boundChromaToRgbGamutRecursive(l, h, c_mid, c_high, recDepth - 1);
+			return this.boundChromaToRgbGamutRecursive(l, h, c_mid, c_high, rec_depth - 1);
 		}
 		else{
-			return this.boundChromaToRgbGamutRecursive(l, h, c_low, c_mid, recDepth - 1);
+			return this.boundChromaToRgbGamutRecursive(l, h, c_low, c_mid, rec_depth - 1);
 		}
 	}
 
@@ -347,7 +347,7 @@ class Oklab{
 		this.rgb_g_norm = rgbChannelToNormialized(this.rgb_g);
 		this.rgb_b_norm = rgbChannelToNormialized(this.rgb_b);
 	}
-	
+
 	private function normalizedToRgb(){
 		this.rgb_r = normalizedToRgbChannel(this.rgb_r_norm);
 		this.rgb_g = normalizedToRgbChannel(this.rgb_g_norm);
@@ -360,7 +360,7 @@ class Oklab{
 		this.rgb_b_lin = normalizedRgbChannelToLinear(this.rgb_b_norm);
 	}
 
-	public function linearRgbToNormalized(){		
+	public function linearRgbToNormalized(){
 		this.rgb_r_norm = linearRgbChannelToNormalized(this.rgb_r_lin);
 		this.rgb_g_norm = linearRgbChannelToNormalized(this.rgb_g_lin);
 		this.rgb_b_norm = linearRgbChannelToNormalized(this.rgb_b_lin);
@@ -504,9 +504,9 @@ class Oklab{
 		this.oklchToLinearRGB();
 	}
 
-	public function roundToDecimal(val: Float, decimalPlaces: Int = 3): Float{
-		var factOfTen = Math.pow(10, decimalPlaces);
-		return Math.round(val * factOfTen) / factOfTen;
+	public function roundToDecimal(val: Float, decimal_places: Int = 3): Float{
+		var fact_of_ten = Math.pow(10, decimal_places);
+		return Math.round(val * fact_of_ten) / fact_of_ten;
 	}
 
 	public function updateTraceVars(){
@@ -562,15 +562,15 @@ class Oklab{
 		this.updateTraceVars();
 
 		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-		
+
 		if(this.isChromaBoundingReq()){
-			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');	
+			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');
 			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 			this.oklchToOklab();
 			this.updateTraceVars();
 			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 		};
-	
+
 		this.oklchToHex();
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	};
@@ -584,7 +584,7 @@ class Oklab{
 		this.updateTraceVars();
 
 		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-		
+
 		if(this.isChromaBoundingReq()){
 			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to nearest sRGB.');			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
@@ -592,7 +592,7 @@ class Oklab{
 			this.updateTraceVars();
 			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 		};
-	
+
 		this.oklchToHex();
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
@@ -606,15 +606,15 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 		this.updateTraceVars();
 
 		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-		
+
 		if(this.isChromaBoundingReq()){
-			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');	
+			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');
 			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 			this.oklchToOklab();
 			this.updateTraceVars();
 			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 		};
-	
+
 		this.oklchToHex();
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	};
@@ -628,7 +628,7 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 		this.updateTraceVars();
 
 		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-		
+
 		if(this.isChromaBoundingReq()){
 			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to nearest sRGB.');			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
 			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
@@ -636,7 +636,7 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 			this.updateTraceVars();
 			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 		};
-	
+
 		this.oklchToHex();
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
