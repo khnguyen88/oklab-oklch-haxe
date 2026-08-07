@@ -326,6 +326,10 @@ class Oklab{
 		}
 	}
 
+	private function getPosDegree(degree: Float){
+		return degree >= 0 ? degree : 360 + degree;
+	}
+
 	private function hexToRgb(){
 		this.rgb_r = hexToRGBChannel(parseHexByChannel(this.hex, 'r'));
 		this.rgb_g = hexToRGBChannel(parseHexByChannel(this.hex, 'g'));
@@ -424,11 +428,13 @@ class Oklab{
 		this.oklch_c = Math.sqrt(Math.pow(this.oklab_a, 2) + Math.pow(this.oklab_b, 2));
 		this.oklch_h = Math.atan2(this.oklab_b, this.oklab_a);
 		this.oklch_h_deg = this.oklch_h * (180 / Math.PI);
+		this.oklch_h_deg = this.getPosDegree(this.oklch_h_deg);
 	}
 
 	private function oklchToOklab(){
 		this.oklab_l = this.oklch_l;
 		this.oklab_lr = this.oklch_lr;
+		this.oklch_h_deg = this.getPosDegree(this.oklch_h_deg);
 		this.oklch_h = this.oklch_h_deg * Math.PI / 180;
 		this.oklab_a = this.oklch_c * Math.cos(this.oklch_h);
 		this.oklab_b = this.oklch_c * Math.sin(this.oklch_h);
@@ -503,13 +509,19 @@ class Oklab{
 		return Math.round(val * factOfTen) / factOfTen;
 	}
 
-	public function update_trace_var(){
+	public function updateTraceVars(){
+		this.updateTraceVarsOklab();
+		this.updateTraceVarsOklch();
+	}
 
+	public function updateTraceVarsOklab(){
 		this.trace_oklab_l = roundToDecimal(this.oklab_l);
 		this.trace_oklab_lr = roundToDecimal(this.oklab_lr);
 		this.trace_oklab_a = roundToDecimal(this.oklab_a);
 		this.trace_oklab_b = roundToDecimal(this.oklab_b);
+	}
 
+	public function updateTraceVarsOklch(){
 		this.trace_oklch_l = roundToDecimal(this.oklch_l);
 		this.trace_oklch_lr = roundToDecimal(this.oklch_lr);
 		this.trace_oklch_c = roundToDecimal(this.oklch_c);
@@ -517,12 +529,17 @@ class Oklab{
 		this.trace_oklch_h_deg = roundToDecimal(this.oklch_h_deg);
 	}
 
+	public function isChromaBoundingReq(){
+		this.oklchToLinearRGB();
+		return !this.inGamut(this.rgb_r_lin, rgb_g_lin, rgb_b_lin);
+	}
+
 	public function setRgb(r: Int = 0, g: Int = 0, b: Int = 0){
 		this.rgb_r = r;
 		this.rgb_g = g;
 		this.rgb_b = b;
 		this.rgbToOklab();
-		this.update_trace_var();
+		this.updateTraceVars();
 		trace('[setRgb] rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b}) hex=${this.hex}');
 		trace('[setRgb] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 	};
@@ -531,9 +548,9 @@ class Oklab{
 	public function setHex(hex: String = "#000000"){
 		this.hex = this.sanitizeHex(hex);
 		this.hexToOklab();
-		this.update_trace_var();
+		this.updateTraceVars();
 		trace('[setHex] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
-		trace('[setHex] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg}})');
+		trace('[setHex] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
 	};
 
 	public function setOklch(l: Float = 1.000, c: Float = 0.000, h: Float = 0.000){
@@ -542,11 +559,20 @@ class Oklab{
 		this.oklch_c = c;
 		this.oklch_h_deg = h;
 		this.oklchToOklab();
-		this.update_trace_var();
-		trace('[setOklch] oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg}) oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b})');
-		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, c, 20);
+		this.updateTraceVars();
+
+		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		
+		if(this.isChromaBoundingReq()){
+			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');	
+			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			this.oklchToOklab();
+			this.updateTraceVars();
+			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		};
+	
 		this.oklchToHex();
-		trace('[setOklch] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
+		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	};
 
 	public function setOklab(l: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
@@ -555,9 +581,18 @@ class Oklab{
 		this.oklab_a = a;
 		this.oklab_b = b;
 		this.oklabToOklch();
-		this.update_trace_var();
+		this.updateTraceVars();
+
 		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+		
+		if(this.isChromaBoundingReq()){
+			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to nearest sRGB.');			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			this.oklchToOklab();
+			this.updateTraceVars();
+			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		};
+	
 		this.oklchToHex();
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}
@@ -568,11 +603,20 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 		this.oklch_c = c;
 		this.oklch_h_deg = h;
 		this.oklchToOklab();
-		this.update_trace_var();
-		trace('[setOklch] oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg}) oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b})');
-		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, c, 20);
+		this.updateTraceVars();
+
+		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		
+		if(this.isChromaBoundingReq()){
+			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to the nearest sRGB.');	
+			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			this.oklchToOklab();
+			this.updateTraceVars();
+			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		};
+	
 		this.oklchToHex();
-		trace('[setOklch] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
+		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	};
 
 	public function setOkLrab(lr: Float = 1.000, a: Float = 0.000, b: Float = 0.000){
@@ -581,9 +625,18 @@ public function setOkLrch(lr: Float = 1.000, c: Float = 0.000, h: Float = 0.000)
 		this.oklab_a = a;
 		this.oklab_b = b;
 		this.oklabToOklch();
-		this.update_trace_var();
+		this.updateTraceVars();
+
 		trace('[setOklab] oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
-		this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+		
+		if(this.isChromaBoundingReq()){
+			trace('[setOklab] The existing chroma is outside the sRGB Gamut. Will adjust chroma to nearest sRGB.');			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			this.oklch_c = this.boundChromaToRgbGamutRecursive(this.oklch_l, this.oklch_h, 0, this.oklch_c, 20);
+			this.oklchToOklab();
+			this.updateTraceVars();
+			trace('[setOklab] bounded_oklab=(${this.trace_oklab_l}, ${this.trace_oklab_a}, ${this.trace_oklab_b}) bounded_oklch=(${this.trace_oklch_l}, ${this.trace_oklch_c}, ${this.trace_oklch_h_deg})');
+		};
+	
 		this.oklchToHex();
 		trace('[setOklab] hex=${this.hex} rgb=(${this.rgb_r},${this.rgb_g},${this.rgb_b})');
 	}

@@ -2,19 +2,100 @@
 
 Haxe implementation of Oklab and Oklch color spaces
 
-## Status
-
-WIP - Wrote the README.md and setup the project folder.
-
 ## Purpose
 
 This is a Haxe Oklab Oklch utility conversion module/class. It also includes methods to convert to/from OkLrab and OkLrch.
+
+## How to use
+
+### STEPS 
+1. IMPORT MODULE
+
+1. SET THE INITIAL COLOR VALUES
+    - CONVERSION IS AUTOMATED UNDER THE HOOD
+
+2. PULLOUT AND INDIVIDUAL VALUES
+
+
+### Import the `oklab` module
+```hx
+package oklab;
+```
+
+### Set the HEX value
+
+```hx
+var red = new Oklab();
+red.setHex("#FF0000");
+
+//Output
+// [setHex] hex=#FF0000 rgb=(255,0,0)
+// [setHex] oklab=(0.628, 0.225, 0.126) oklch=(0.628, 0.258, 29.234)
+```
+
+### Set the RGB values
+
+```hx
+var fromRgb = new Oklab();
+fromRgb.setRgb(0, 128, 255);
+
+//Output
+// [setRgb] rgb=(0,128,255) hex=#0080FF
+// [setRgb] oklab=(0.615, -0.051, -0.205) oklch=(0.615, 0.211, 256.099)
+```
+
+### Set the Oklab values
+
+```hx
+var fromOklab = new Oklab();
+    fromOklab.setOklab(0.7, 0.1, 0.1);
+
+//Output
+// [setOklab] oklab=(0.7, 0.1, 0.1) oklch=(0.7, 0.141, 45)
+// [setOklab] hex=#E57F4E rgb=(229,127,78)
+```
+
+### Set the Oklch values
+
+```hx
+var fromOklch = new Oklab();
+fromOklch.setOklch(0.75, 0.15, 1.5);
+
+//Output
+// [setOklch] oklch=(0.75, 0.15, 1.5) oklab=(0.75, 0.15, 0.004)
+// [setOklch] hex=#F982A7 rgb=(249,130,167)
+```
+
+### Set the Oklrch values
+
+```hx
+var fromOklch = new Oklab();
+fromOklch.setOklch(0.75, 0.15, 1.5);
+
+//Output
+// [setOklrch] oklch=(0.828, 0.12, 2) oklab=(0.828, 0.12, 0.004)
+// [setOklrch] hex=#FFABC1 rgb=(255,171,193)
+```
+
+### Set the Oklrab values
+```hx
+var fromOklrab = new Oklab();
+fromOklrab.setOkLrab(0.8, 0.1, 0.1);
+
+//Output
+// [setOklrab] oklab=(1, 0, 0) oklch=(1, 0, 89.876)
+// [setOklrab] hex=#FFFFFF rgb=(255,255,255)
+```
 
 ## Inspiration
 
 This project was inspired by Alexei Boronine's [hsluv-haxe](https://github.com/hsluv/hsluv-haxe/tree/main) project. I was looking for an open-source project to contribute to, and a peer, Isaac or logoooo (Discord), on my university's CIS Discord channel proposed that I build an oklab/oklch module/library for the Haxe programming language. He is pretty involved with the Haxe and Ceramic community and suggested I contribute.
 
 Since I am an artist and have a fascination and appreciation for colors and color science, this was the perfect project for me. So here we are!
+
+## Status
+
+WIP - Testing and validatiing.
 
 ## Module Details
 
@@ -39,11 +120,9 @@ If you look at my source code, you will notice that the Oklab and Oklch variable
 
 - Oklab Lr = The lightness adjusted to behave like CIELab inside a color picker.
 
-The relationship between L and Lr in Oklab/Oklch is an algberic formula used to shift the raw Oklab cublic relationship to match that of CIELAB'S L* / 100.
+The relationship between L and Lr in Oklab/Oklch is an algberic formula used to shift the raw Oklab cublic relationship to match that of CIELAB'S L\* / 100.
 
 This decision was made after reading one of Bjorn Ottosson's blogs on color pickers, and its section on a [new way to estimate lightness "L" for Oklab](https://bottosson.github.io/posts/colorpicker/#intermission---a-new-lightness-estimate-for-oklab)
-
-From what I understand, in reference to the sRGB conversion to RGB
 
 ### Whitepoint is not related to Lightness
 
@@ -65,7 +144,7 @@ In the [source code](https://bottosson.github.io/posts/oklab/#converting-from-li
 | Y   | =   | M   | \*  | G'  |
 | Z   |     |     |     | B'  |
 
----
+and
 
 |     |     |     |     |     |
 | --- | --- | --- | --- | --- |
@@ -169,11 +248,15 @@ To ensure we do, if a chroma value results in a linear sRGB value less than zero
 
 We achieve this with a binary recursive search, iterating through the Oklch/Oklab to linear sRGB color space, and reducing or increasing the c value until all linear sRGB channels are bounded within the sRGB gamut.
 
+### Cartesian coordinates vs Polar Coordinates
+
+- Oklch is effective polar coordinates, why Oklab is cartesian coordinates
+
 ## Resources / References
 
 ### Color Science
 
-The science and math used to understand the Oklab and Oklch color space and implemented in this module was taken from:
+The science and math used to understand the Oklab and Oklch color space and implemented in this module was taken from the following sources. The main source being Bjorn Ottoson:
 
 - [Bjorn Ottosson - A perceptual color space for image processing (Oklab)](https://bottosson.github.io/posts/oklab/)
 - [Image Engineering - How to convert between sRGB and CIEXYZ ](https://www.image-engineering.de/en/resources/tech-notes/convert-between-srgb-and-ciexyz/)
@@ -197,8 +280,6 @@ The science and math used to understand the Oklab and Oklch color space and impl
 - [Wikipedia - Colorfulness](https://en.wikipedia.org/wiki/Colorfulness)
 
 - [Peter Donahue - Saturation vs Chroma](https://petertdonahue.com/Saturation-vs-Chroma.html)
-
--
 
 ### Programming Language
 
@@ -228,6 +309,20 @@ The science and math used to understand the Oklab and Oklch color space and impl
 
 - [Omni Calculator - How to Convert Number to Hexadecimal](https://www.omnicalculator.com/conversion/decimal-to-hexadecimal)
 
+### Sanity Checks / Tests
+
+The Oklch online converter was used as an independent source of truth for sanity spot checks and debugging purposes to compare and evalute the conversion between OKLCH <-> HEX.
+
+- [Oklch - Color Picker & Converter](https://oklch.com)
+
+An XYZ and Oklab pair table for in Bjorn's Ottosson was used to check the intermediate steps and their output when converting from the CIE-XYZ color space to the Oklab color space.
+
+- [Table of example XYZ and Oklab pairs](https://bottosson.github.io/posts/oklab/#table-of-example-xyz-and-oklab-pairs)
+
+Mirror tests were used to see if there were any issue in the color space conversion process, aka. matrices transformations. For example if we used output from an HEX to OKLCH conversion as input for the OKLCH to HEX conversion, the mirrored input/output values should be the same. If not, there is a bug or issue somewhere in one of the steps.
+
+Edge cases at or near the sRGB Gamut are tested, as any Oklab or Oklch values that exceeds the rgbGamu this can easily evaluated in the linear sRGB color space, where colors need to be within
+
 ### Reference Project
 
 In addition to Haxe's own documentation, I used Alexei's hsluv-haxe as a resource to learn and understand how to setup project structure and write the language syntax for Haxe. Since it's the go-to module for the Haxe community, I know it'll be a reliable resource. There will be similarity when you compare the two projects, but luckily the math for the hsluv and oklab/oklch will be _mostly_ different! The process required to convert sRGB to sRGB' and sRGB' to CIEXYZ is the same for both color spaces.
@@ -236,4 +331,8 @@ In addition to Haxe's own documentation, I used Alexei's hsluv-haxe as a resourc
 
 ## Disclaimer
 
-I am not an expert in color science or color theory, but I do appreciate it and I enjoy learning. I don't have everything fully grasp but I'm doing my best to get there. If you spot anything factually in correct
+I am not an expert in color science or color theory, but I do appreciate it and I enjoy learning. I don't have everything fully grasp but I'm doing my best to get there. If you spot anything factually in correct.
+
+A LLM (GLM 5.1) was used sparingly towards the end to generate the build files and the snapshot and test cases and files in order to save time. The other time the LLM was used was to help pinpoint one bug, the negative cubic root error , that I could not figure out on my own. That's it.
+
+I wrote everything else.
