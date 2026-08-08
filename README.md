@@ -136,7 +136,7 @@ trace("oklch: " + oklch);
 
 ## Inspiration
 
-This project was inspired by Alexei Boronine's [hsluv-haxe](https://github.com/hsluv/hsluv-haxe/tree/main) project. I was looking for an open-source project to contribute to, and a peer, Isaac or logoooo (Discord), on my university's CIS Discord channel proposed that I build an oklab/oklch module/library for the Haxe programming language. He is pretty involved with the Haxe and Ceramic community and suggested I contribute.
+This project was inspired by Alexei Boronine's [hsluv-haxe](https://github.com/hsluv/hsluv-haxe/tree/main) project. I was looking for an open-source project to contribute to, and a peer on my university's CIS Discord channel proposed that I build an oklab/oklch module/library for the Haxe programming language. He is pretty involved with the Haxe and Ceramic community and suggested I contribute.
 
 Since I am an artist and have a fascination and appreciation for colors and color science, this was the perfect project for me. So here we are!
 
