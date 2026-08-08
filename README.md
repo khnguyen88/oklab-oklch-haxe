@@ -289,9 +289,9 @@ The peak shifts by hue. Yellow cusps near white (L≈0.97), blue cusps well belo
 
 Oklch and Oklab have a wider color gamut (color boundary) and a wider range of colors than sRGB.
 
-When converting Oklch/Oklab back to sRGB, we need to ensure we preserve the sRGB values. Chroma, c, or `sqrt( a^2 + b^2)`, colorfulness.
+When converting Oklch/Oklab back to sRGB, we need to ensure we preserve the sRGB values. Chroma (c) and Lightness (l) are the parameters are the main drivers that changes the sRGB and linear RGB values. Chroma being the primary driver.
 
-To ensure we do, if a chroma value results in a linear sRGB value less than zero or greater than one for any of the channels, it means it is outside of the gamut; we need to adjust the chroma so that it stays within the boundary.
+To ensure we do, if a chroma value results in a linear sRGB value less than zero or greater than one for any of the channels, it means it is outside of the gamut; too keep the adjustment process simple, we ignore lightness and adjust the chroma so that it stays within the boundary.
 
 We achieve this with a binary recursive search, iterating through the Oklch/Oklab to linear sRGB color space, and reducing or increasing the c value until all linear sRGB channels are bounded within the sRGB gamut.
 
